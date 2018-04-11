@@ -10,6 +10,7 @@
 AvlTree::AvlTree()
 {
 	rootNode = 0;
+	//curNode = 0;
 }
 
 AvlTree::~AvlTree() {}
@@ -33,7 +34,7 @@ void AvlTree::addItem(Eclipse* myEclipse)
 				curNode->setRightChild(insertNode);
 				isAdded = true;
 				//Now we check tree for re-balancing
-				balanceTree(insertNode);
+				//balanceTree(insertNode);
 				return;
 			}
 			recurseAdd(curNode,myEclipse,isAdded);
@@ -46,7 +47,7 @@ void AvlTree::addItem(Eclipse* myEclipse)
 				curNode->setLeftChild(insertNode);
 				isAdded = true;
 				//Now we check tree for re-balancing
-				balanceTree(insertNode);
+				//balanceTree(insertNode);
 				return;
 			}
 			recurseAdd(curNode,myEclipse,isAdded);
@@ -69,7 +70,7 @@ void AvlTree::recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &isAdded)
 			curNode->setRightChild(insertNode);
 			isAdded = true;
 			//Now we check tree for re-balancing
-			balanceTree(insertNode);
+			//balanceTree(insertNode);
 			return;
 		}
 		recurseAdd(curNode,myEclipse,isAdded);
@@ -82,7 +83,7 @@ void AvlTree::recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &isAdded)
 			curNode->setLeftChild(insertNode);
 			isAdded = true;
 			//Now we check tree for re-balancing
-			balanceTree(insertNode);
+			//balanceTree(insertNode);
 			return;
 		}
 		recurseAdd(curNode,myEclipse,isAdded);
@@ -119,9 +120,43 @@ void AvlTree::printPreOrder()
 	//TODO
 }
 
-void AvlTree::printInOrder()
+void AvlTree::printPreOrder(TreeNode* curNode)
 {
 	//TODO
+}
+
+void AvlTree::printInOrder()
+{
+	TreeNode* curNode = rootNode;
+	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		printInOrder(curNode->getLeftChild());
+	}
+
+	if (curNode != 0)
+	{
+		cout << *(curNode->getEclipse());
+	}
+
+	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		printInOrder(curNode->getRightChild());
+	}
+}
+
+void AvlTree::printInOrder(TreeNode* curNode)
+{
+	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		printInOrder(curNode->getLeftChild());
+	}
+
+	cout << *(curNode->getEclipse());
+
+	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		printInOrder(curNode->getRightChild());
+	}
 }
 
 void AvlTree::printPostOrder()
@@ -129,7 +164,7 @@ void AvlTree::printPostOrder()
 	//TODO
 }
 
-void AvlTree::balanceTree(TreeNode* insertedNode)
+void AvlTree::printPostOrder(TreeNode* curNode)
 {
 	//TODO
 }
@@ -160,7 +195,34 @@ int balanceFactorResult(TreeNode* subHeadNode)
 }
 //----------------------------------------------------------------
 int main() {
-	AvlTree myTree();
+	string* myString1 = new string[18];
+	string* myString2 = new string[18];
+	string* myString3 = new string[18];
+	for (int i = 0; i < 18; i++)
+	{
+		myString1[i] = "1";
+		myString2[i] = "2";
+		myString3[i] = "3";
+	}
+	Eclipse* myEclipse1 = new Eclipse(myString1);
+	Eclipse* myEclipse2 = new Eclipse(myString2);
+	Eclipse* myEclipse3 = new Eclipse(myString3);
+
+	AvlTree* myTree = new AvlTree();
+	myTree->addItem(myEclipse2);
+	cout << "Tried to add eclipse2" << endl;
+	myTree->addItem(myEclipse1);
+	cout << "Tried to add eclipse1" << endl;
+	myTree->addItem(myEclipse3);
+	cout << "Tried to add eclipse3" << endl;
+
+	cout << myTree->getRootNode()->getLeftChild()->getKey() << endl;
+	cout << myTree->getRootNode()->getKey() << endl;
+	cout << myTree->getRootNode()->getRightChild()->getKey() << endl;
+
+	myTree->printInOrder();
+
+
 
 	return 0;
 }

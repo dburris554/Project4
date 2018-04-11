@@ -33,7 +33,11 @@ private:
 	int maxDepth(TreeNode* subHeadNode); //call this on BalanceFactor's left and right child
 	void recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &isAdded); //use to simplify addItem recursion
 	int balanceFactorResult(TreeNode* subHeadNode); //returns balance factor of Node
+	void printPreOrder(TreeNode* curNode); //recurse print for pre-order
+	void printInOrder(TreeNode* curNode); //recurse print in-order
+	void printPostOrder(TreeNode* curNode); //recurse print post-order
 	TreeNode* rootNode;
+	//TreeNode* curNode;
 };
 
 #endif /* AVLTREE_H_ */
