@@ -16,7 +16,14 @@ public:
 	AvlTree();
 	virtual ~AvlTree();
 	void addItem(Eclipse* myEclipse);
-
+	TreeNode* getRootNode();
+	void removeItem(Eclipse* myEclipse); //you can remove a node with an eclipse or key
+	void removeItem(int key);
+	Eclipse* findEclipse(int key);
+	TreeNode* findNode(int key);
+	void printPreOrder();
+	void printInOrder();
+	void printPostOrder();
 
 private:
 	TreeNode* balanceTree(TreeNode* insertedNode); //use balanceResult to determine rotation
