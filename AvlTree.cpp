@@ -17,7 +17,7 @@ AvlTree::~AvlTree() {
 }
 
 int main() {
-	AvlTree myTree = new AvlTree();
+	AvlTree myTree();
 
 	return 0;
 }

@@ -11,7 +11,7 @@
 
 using namespace std;
 
-int main ()
+/*int main()
 {
 	string* header[10]; //holds header data for output
 	string tmp = ""; //string placeholder often used in user input
@@ -142,7 +142,7 @@ int main ()
 		} while(userChoice != "Q" && userChoice != "q");
 	}
 	return 0;
-}
+}*/
 /////////////////////////// Method Implementations ////////////////////////////
 bool processLine(string tmp, int lineNum, LinkedList* myList, Eclipse* myEclipse, int& numDuplicates, bool toAdd)
 {
