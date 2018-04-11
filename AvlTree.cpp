@@ -9,14 +9,84 @@
 
 AvlTree::AvlTree()
 {
-	//TODO
+	rootNode = 0;
 }
 
 AvlTree::~AvlTree() {}
 
 void AvlTree::addItem(Eclipse* myEclipse)
 {
-	//TODO
+	//TODO //If no rootNode, add as rootNode. Else, add as regular node
+	if (rootNode == 0)
+	{
+		rootNode = new TreeNode(myEclipse);
+	}
+	else //Find insertion location recursively and insert as non-root node
+	{
+		TreeNode* curNode = rootNode;
+		bool isAdded = false;
+		if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
+		{
+			if (curNode->getRightChild() == 0) //insert here if right child is 0
+			{
+				TreeNode* insertNode = new TreeNode(curNode,myEclipse);
+				curNode->setRightChild(insertNode);
+				isAdded = true;
+				//Now we check tree for re-balancing
+				balanceTree(insertNode);
+				return;
+			}
+			recurseAdd(curNode,myEclipse,isAdded);
+		}
+		else //otherwise, myEclipse ID should be < curNode's key, so recurse left
+		{
+			if (curNode->getLeftChild() == 0) //insert here if left child is 0
+			{
+				TreeNode* insertNode = new TreeNode(curNode,myEclipse);
+				curNode->setLeftChild(insertNode);
+				isAdded = true;
+				//Now we check tree for re-balancing
+				balanceTree(insertNode);
+				return;
+			}
+			recurseAdd(curNode,myEclipse,isAdded);
+		}
+	}
+}
+
+void AvlTree::recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &isAdded)
+{
+	if (isAdded)
+	{
+		return;
+	}
+	TreeNode* insertNode;
+	if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
+	{
+		if (curNode->getRightChild() == 0) //insert here if right child is 0
+		{
+			insertNode = new TreeNode(curNode,myEclipse);
+			curNode->setRightChild(insertNode);
+			isAdded = true;
+			//Now we check tree for re-balancing
+			balanceTree(insertNode);
+			return;
+		}
+		recurseAdd(curNode,myEclipse,isAdded);
+	}
+	else //otherwise, myEclipse ID should be < curNode's key, so recurse left
+	{
+		if (curNode->getLeftChild() == 0) //insert here if left child is 0
+		{
+			insertNode = new TreeNode(curNode,myEclipse);
+			curNode->setLeftChild(insertNode);
+			isAdded = true;
+			//Now we check tree for re-balancing
+			balanceTree(insertNode);
+			return;
+		}
+		recurseAdd(curNode,myEclipse,isAdded);
+	}
 }
 
 TreeNode* AvlTree::getRootNode()
@@ -59,27 +129,27 @@ void AvlTree::printPostOrder()
 	//TODO
 }
 
-TreeNode* balanceTree(TreeNode* insertedNode)
+void AvlTree::balanceTree(TreeNode* insertedNode)
 {
 	//TODO
 }
 
-TreeNode* rotateTree(TreeNode* unbalNode)
+TreeNode* AvlTree::rotateTree(TreeNode* unbalNode)
 {
 	//TODO
 }
 
-TreeNode* rotateLeft(TreeNode* subHeadNode)
+TreeNode* AvlTree::rotateLeft(TreeNode* subHeadNode)
 {
 	//TODO
 }
 
-TreeNode* rotateRight(TreeNode* subHeadNode)
+TreeNode* AvlTree::rotateRight(TreeNode* subHeadNode)
 {
 	//TODO
 }
 
-int maxDepth(TreeNode* subHeadNode)
+int AvlTree::maxDepth(TreeNode* subHeadNode)
 {
 	//TODO
 }

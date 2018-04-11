@@ -26,11 +26,12 @@ public:
 	void printPostOrder();
 
 private:
-	TreeNode* balanceTree(TreeNode* insertedNode); //use balanceResult to determine rotation
+	void balanceTree(TreeNode* insertedNode); //use balanceResult to determine rotation
 	TreeNode* rotateTree(TreeNode* unbalNode); //call this for unbalanced Node in balanceTree
 	TreeNode* rotateLeft(TreeNode* subHeadNode);
 	TreeNode* rotateRight(TreeNode* subHeadNode);
 	int maxDepth(TreeNode* subHeadNode); //call this on BalanceFactor's left and right child
+	void recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &isAdded); //use to simplify addItem recursion
 	int balanceFactorResult(TreeNode* subHeadNode); //returns balance factor of Node
 	TreeNode* rootNode;
 };
