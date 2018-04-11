@@ -1,0 +1,20 @@
+Title: Five Millennium Catalog of Solar Eclipses: -1999 to +3000 (2000 BCE to 3000CE)
+Authors: Fred Espenak and Jean Meeus
+Source: Based on NASA Technical Publication TP-2006-21414
+Catalog Key: http://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
+Date: 2007 Jan 26
+----------------------------------------------------------------------------------------------------------------
+                            TD of
+ Cat. Canon    Calendar   Greatest          Luna Saros Ecl.           Ecl.                Sun  Sun  Path Central
+  No. Plate      Date      Eclipse     DT    Num  Num  Type  Gamma    Mag.   Lat.   Long. Alt  Azm Width   Dur.
+                                       s                                      �      �     �    �   km
+    8  001  -1997 Nov 14  18:48:49  46379 -49426   30   P   -1.5183  0.0377  61.5S  27.7W   0  120             
+    1  002  -1999 Jun 12  03:14:51  46438 -49456    5   T   -0.2701  1.0733   6.0N  33.3W  74  344  247  06m37s
+    2  003  -1999 Dec 05  23:45:23  46426 -49450   10   A   -0.2317  0.9382  32.9S  10.8E  76   21  236  06m44s
+    5  004  -1997 Apr 22  13:19:56  46393 -49433  -13   P   -1.4670  0.1611  60.6S 106.4W   0  281             
+    3  005  -1998 Jun 01  18:09:16  46415 -49444   15   T    0.4994  1.0284  46.2N  83.4E  60  151  111  02m15s
+    4  006  -1998 Nov 25  05:57:03  46403 -49438   20   A   -0.9045  0.9806  67.8S 143.8W  25   74  162  01m14s
+    6  007  -1997 May 22  02:45:35  46391 -49432   25   P    1.3253  0.4035  61.7N 151.7W   0   55             
+   10  008  -1996 Oct 04  23:23:37  46358 -49415    2   T    0.5166  1.0257  28.8N  38.6E  59  214  101  02m04s
+    7  009  -1997 Oct 16  08:01:52  46381 -49427   -8   P    1.1669  0.6954  60.6N  22.7W   0  265             
+    9  010  -1996 Apr 10  13:54:52  46369 -49421   -3   A   -0.7231  0.9464  38.2S 167.2W  43  321  277  05m11s
