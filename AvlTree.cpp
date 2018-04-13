@@ -117,12 +117,36 @@ TreeNode* AvlTree::findNode(int key)
 
 void AvlTree::printPreOrder()
 {
-	//TODO
+	TreeNode* curNode = rootNode;
+	if (curNode != 0)
+	{
+		cout << *(curNode->getEclipse());
+	}
+
+	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		printInOrder(curNode->getLeftChild());
+	}
+
+	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		printInOrder(curNode->getRightChild());
+	}
 }
 
 void AvlTree::printPreOrder(TreeNode* curNode)
 {
-	//TODO
+	cout << *(curNode->getEclipse());
+
+	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		printInOrder(curNode->getLeftChild());
+	}
+
+	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		printInOrder(curNode->getRightChild());
+	}
 }
 
 void AvlTree::printInOrder()
@@ -161,12 +185,36 @@ void AvlTree::printInOrder(TreeNode* curNode)
 
 void AvlTree::printPostOrder()
 {
-	//TODO
+	TreeNode* curNode = rootNode;
+	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		printInOrder(curNode->getLeftChild());
+	}
+
+	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		printInOrder(curNode->getRightChild());
+	}
+
+	if (curNode != 0)
+	{
+		cout << *(curNode->getEclipse());
+	}
 }
 
 void AvlTree::printPostOrder(TreeNode* curNode)
 {
-	//TODO
+	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		printInOrder(curNode->getLeftChild());
+	}
+
+	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		printInOrder(curNode->getRightChild());
+	}
+
+	cout << *(curNode->getEclipse());
 }
 
 TreeNode* AvlTree::rotateTree(TreeNode* unbalNode)
@@ -198,29 +246,36 @@ int main() {
 	string* myString1 = new string[18];
 	string* myString2 = new string[18];
 	string* myString3 = new string[18];
+	string* myString4 = new string[18];
+	string* myString5 = new string[18];
+	string* myString6 = new string[18];
 	for (int i = 0; i < 18; i++)
 	{
 		myString1[i] = "1";
 		myString2[i] = "2";
 		myString3[i] = "3";
+		myString4[i] = "4";
+		myString5[i] = "5";
+		myString6[i] = "6";
 	}
 	Eclipse* myEclipse1 = new Eclipse(myString1);
 	Eclipse* myEclipse2 = new Eclipse(myString2);
 	Eclipse* myEclipse3 = new Eclipse(myString3);
+	Eclipse* myEclipse4 = new Eclipse(myString4);
+	Eclipse* myEclipse5 = new Eclipse(myString5);
+	Eclipse* myEclipse6 = new Eclipse(myString6);
 
 	AvlTree* myTree = new AvlTree();
+	myTree->addItem(myEclipse4);
 	myTree->addItem(myEclipse2);
-	cout << "Tried to add eclipse2" << endl;
+	myTree->addItem(myEclipse5);
 	myTree->addItem(myEclipse1);
-	cout << "Tried to add eclipse1" << endl;
 	myTree->addItem(myEclipse3);
-	cout << "Tried to add eclipse3" << endl;
+	myTree->addItem(myEclipse6);
 
-	cout << myTree->getRootNode()->getLeftChild()->getKey() << endl;
-	cout << myTree->getRootNode()->getKey() << endl;
-	cout << myTree->getRootNode()->getRightChild()->getKey() << endl;
-
+	//myTree->printPreOrder();
 	myTree->printInOrder();
+	//myTree->printPostOrder();
 
 
 
