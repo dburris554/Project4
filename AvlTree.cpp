@@ -25,68 +25,68 @@ void AvlTree::addItem(Eclipse* myEclipse)
 	else //Find insertion location recursively and insert as non-root node
 	{
 		TreeNode* curNode = rootNode;
-		bool isAdded = false;
+		
 		if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
 		{
 			if (curNode->getRightChild() == 0) //insert here if right child is 0
 			{
-				TreeNode* insertNode = new TreeNode(curNode,myEclipse);
-				curNode->setRightChild(insertNode);
-				isAdded = true;
+				
+				curNode->setRightChild(new TreeNode(curNode,myEclipse));
+				
 				//Now we check tree for re-balancing
 				//balanceTree(insertNode);
 				return;
 			}
-			recurseAdd(curNode,myEclipse,isAdded);
+			recurseAdd(curNode->getRightChild(),myEclipse);
 		}
 		else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 		{
 			if (curNode->getLeftChild() == 0) //insert here if left child is 0
 			{
-				TreeNode* insertNode = new TreeNode(curNode,myEclipse);
-				curNode->setLeftChild(insertNode);
-				isAdded = true;
+				
+				curNode->setLeftChild(new TreeNode(curNode,myEclipse));
+
 				//Now we check tree for re-balancing
 				//balanceTree(insertNode);
 				return;
 			}
-			recurseAdd(curNode,myEclipse,isAdded);
+			recurseAdd(curNode->getLeftChild(),myEclipse);
 		}
 	}
 }
 
-void AvlTree::recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &isAdded)
+void AvlTree::recurseAdd(TreeNode* curNode, Eclipse* myEclipse)
 {
-	if (isAdded)
-	{
-		return;
-	}
-	TreeNode* insertNode;
+
+
+
+
+
 	if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
 	{
 		if (curNode->getRightChild() == 0) //insert here if right child is 0
 		{
-			insertNode = new TreeNode(curNode,myEclipse);
-			curNode->setRightChild(insertNode);
-			isAdded = true;
+
+			curNode->setRightChild(new TreeNode(curNode,myEclipse));
+
 			//Now we check tree for re-balancing
 			//balanceTree(insertNode);
 			return;
 		}
-		recurseAdd(curNode,myEclipse,isAdded);
+		recurseAdd(curNode->getRightChild(),myEclipse);
 	}
 	else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 	{
 		if (curNode->getLeftChild() == 0) //insert here if left child is 0
 		{
-			insertNode = new TreeNode(curNode,myEclipse);
-			curNode->setLeftChild(insertNode);
-			isAdded = true;
+
+			curNode->setLeftChild(new TreeNode(curNode,myEclipse));
+
 			//Now we check tree for re-balancing
 			//balanceTree(insertNode);
 			return;
 		}
-		recurseAdd(curNode,myEclipse,isAdded);
+		recurseAdd(curNode->getLeftChild(),myEclipse);
 	}
 }
 
