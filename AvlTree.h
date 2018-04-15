@@ -26,18 +26,16 @@ public:
 	void printPostOrder();
 
 private:
-	void balanceTree(TreeNode* insertedNode); //use balanceResult to determine rotation
-	TreeNode* rotateTree(TreeNode* unbalNode); //call this for unbalanced Node in balanceTree
-	TreeNode* rotateLeft(TreeNode* subHeadNode);
-	TreeNode* rotateRight(TreeNode* subHeadNode);
-	int maxDepth(TreeNode* subHeadNode); //call this on BalanceFactor's left and right child
-	void recurseAdd(TreeNode* curNode, Eclipse* myEclipse); //use to simplify addItem recursion
-	int balanceFactorResult(TreeNode* subHeadNode); //returns balance factor of Node
+	bool balanceTree(TreeNode* insertedNode); //use balanceResult to determine rotation
+	void leftHeavyRotate(TreeNode* nodeA);
+	void leftInnerRotate(TreeNode* nodeA);
+	void rightHeavyRotate(TreeNode* nodeA);
+	void rightInnerRotate(TreeNode* nodeA);
+	void recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &hasRotated); //use to simplify addItem recursion
 	void printPreOrder(TreeNode* curNode); //recurse print for pre-order
 	void printInOrder(TreeNode* curNode); //recurse print in-order
 	void printPostOrder(TreeNode* curNode); //recurse print post-order
 	TreeNode* rootNode;
-	//TreeNode* curNode;
 };
 
 #endif /* AVLTREE_H_ */
