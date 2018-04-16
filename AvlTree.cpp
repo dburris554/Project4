@@ -396,8 +396,11 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA) //In this case, only nodeA, node
 			parentOfA->setLeftChild(nodeB);
 		}
 	}
-	else (nodeB->setParent(0)); //otherwise, assign nodeB's parent as 0, and nodeB is now the root
-	rootNode = nodeB;
+	else //otherwise, assign nodeB's parent as 0, and nodeB is now the root
+	{
+		nodeB->setParent(0);
+		rootNode = nodeB;
+	}
 
 	nodeA->setBalanceFactor(0); //Reset balance factors of main nodes of the rotation
 	nodeB->setBalanceFactor(0);
@@ -469,7 +472,7 @@ int main() {
 	myTree->addItem(myEclipse3);
 	myTree->addItem(myEclipse4);
 	myTree->addItem(myEclipse5);
-	myTree->addItem(myEclipse6);
+	/*myTree->addItem(myEclipse6);*/
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();
