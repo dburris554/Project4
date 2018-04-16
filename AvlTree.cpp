@@ -81,11 +81,6 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 			curNode->setRightChild(insertNode); //when assigning insertNode, need to assign parent relation
 			insertNode->setParent(curNode);
 			curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
-
-			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing? May not have to
-			{
-				hasRotated = balanceTree(insertNode);
-			}
 			return;
 		}
 
@@ -108,11 +103,6 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 			curNode->setLeftChild(insertNode);
 			insertNode->setParent(curNode);
 			curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
-
-			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing? May not have to
-			{
-				hasRotated = balanceTree(insertNode);
-			}
 			return;
 		}
 
@@ -136,11 +126,6 @@ TreeNode* AvlTree::getRootNode()
 }
 
 void AvlTree::removeItem(Eclipse* myEclipse)
-{
-	//TODO
-}
-
-void AvlTree::removeItem(int key)
 {
 	//TODO
 }
@@ -215,6 +200,26 @@ void AvlTree::printPostOrder(TreeNode* curNode)
 	cout << *(curNode->getEclipse());
 }
 
+void AvlTree::copyToArray(ResizeableArray<Eclipse> &myEclipses)
+{
+	copyToArray(myEclipses,rootNode);
+}
+
+void AvlTree::copyToArray(ResizeableArray<Eclipse> &myEclipses, TreeNode* firstNode)
+{
+	if (firstNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		copyToArray(myEclipses,firstNode->getLeftChild());
+	}
+
+	myEclipses.Add(*(firstNode->getEclipse()));
+
+	if (firstNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		copyToArray(myEclipses,firstNode->getRightChild());
+	}
+}
+
 bool AvlTree::balanceTree(TreeNode* insertedNode) //start from insertion, travel up the parents to check for rotation cases
 {
 	TreeNode* curNode = insertedNode->getParent(); //curNode starts at insertedNode's parent because insertedNode's bF == 0
@@ -253,13 +258,18 @@ bool AvlTree::balanceTree(TreeNode* insertedNode) //start from insertion, travel
 
 void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 {
-	TreeNode* parentOfA = nodeA->getParent();
+	bool isRoot = (nodeA->getParent() == 0);
+	TreeNode* parentOfA;
 	bool isLeftDecent;
-	if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
+	if (!isRoot)
 	{
-		isLeftDecent = true;
+		parentOfA = nodeA->getParent();
+		if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
+		{
+			isLeftDecent = true;
+		}
+		else (isLeftDecent = false);
 	}
-	else (isLeftDecent = false);
 	TreeNode* nodeB = nodeA->getLeftChild();
 	TreeNode* rcOfB = nodeB->getRightChild();
 

@@ -37,7 +37,6 @@ private:
 	TreeNode* parent; //points to parent Node, will be 0 for root node
 	TreeNode* leftChild; //initialize left and right children to 0
 	TreeNode* rightChild;
-	TreeNode* successor; //points to next node in-order of ID number, used for removal
 	Eclipse* eclipse; //main data held in TreeNode
 	int key; //key for each node will be the Eclipse's ID number
 	int balanceFactor; //upon insertion and deletion, re-do balanceFactor
@@ -48,7 +47,6 @@ TreeNode::TreeNode(Eclipse* myEclipse) //used to initialize root node
 	parent = 0;
 	leftChild = 0;
 	rightChild = 0;
-	successor = 0;
 	eclipse = myEclipse;
 	key = eclipse->getID();
 	balanceFactor = 0;
@@ -59,7 +57,6 @@ TreeNode::TreeNode(TreeNode* parentNode, Eclipse* myEclipse) //used to initializ
 	parent = parentNode;
 	leftChild = 0;
 	rightChild = 0;
-	successor = 0;
 	eclipse = myEclipse;
 	key = eclipse->getID();
 	balanceFactor = 0;
@@ -106,16 +103,6 @@ TreeNode* TreeNode::getRightChild()
 	return rightChild;
 }
 
-void TreeNode::setSuccessor(TreeNode* mySuccessor)
-{
-	successor = mySuccessor;
-}
-
-TreeNode* TreeNode::getSuccessor()
-{
-	return successor;
-}
-
 void TreeNode::setEclipse(Eclipse* myEclipse)
 {
 	eclipse = myEclipse;
@@ -149,7 +136,6 @@ TreeNode* TreeNode::operator=(TreeNode* myNode)
 	this->leftChild = myNode->leftChild;
 	this->parent = myNode->parent;
 	this->rightChild = myNode->rightChild;
-	this->successor = myNode->successor;
 	return this;
 }
 //-------------------------------------------------------------
