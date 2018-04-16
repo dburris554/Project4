@@ -467,9 +467,9 @@ int main() {
 	myTree->addItem(myEclipse1);
 	myTree->addItem(myEclipse2);
 	myTree->addItem(myEclipse3);
-	/*myTree->addItem(myEclipse4);
+	myTree->addItem(myEclipse4);
 	myTree->addItem(myEclipse5);
-	myTree->addItem(myEclipse6);*/
+	myTree->addItem(myEclipse6);
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();
