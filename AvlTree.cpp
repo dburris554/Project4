@@ -157,21 +157,7 @@ TreeNode* AvlTree::findNode(int key)
 
 void AvlTree::printPreOrder()
 {
-	TreeNode* curNode = rootNode;
-	if (curNode != 0)
-	{
-		cout << *(curNode->getEclipse());
-	}
-
-	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
-	{
-		printInOrder(curNode->getLeftChild());
-	}
-
-	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
-	{
-		printInOrder(curNode->getRightChild());
-	}
+	printPreOrder(rootNode);
 }
 
 void AvlTree::printPreOrder(TreeNode* curNode)
@@ -180,32 +166,18 @@ void AvlTree::printPreOrder(TreeNode* curNode)
 
 	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
 	{
-		printInOrder(curNode->getLeftChild());
+		printPreOrder(curNode->getLeftChild());
 	}
 
 	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
 	{
-		printInOrder(curNode->getRightChild());
+		printPreOrder(curNode->getRightChild());
 	}
 }
 
 void AvlTree::printInOrder()
 {
-	TreeNode* curNode = rootNode;
-	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
-	{
-		printInOrder(curNode->getLeftChild());
-	}
-
-	if (curNode != 0)
-	{
-		cout << *(curNode->getEclipse());
-	}
-
-	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
-	{
-		printInOrder(curNode->getRightChild());
-	}
+	printInOrder(rootNode);
 }
 
 void AvlTree::printInOrder(TreeNode* curNode)
@@ -225,33 +197,19 @@ void AvlTree::printInOrder(TreeNode* curNode)
 
 void AvlTree::printPostOrder()
 {
-	TreeNode* curNode = rootNode;
-	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
-	{
-		printInOrder(curNode->getLeftChild());
-	}
-
-	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
-	{
-		printInOrder(curNode->getRightChild());
-	}
-
-	if (curNode != 0)
-	{
-		cout << *(curNode->getEclipse());
-	}
+	printPostOrder(rootNode);
 }
 
 void AvlTree::printPostOrder(TreeNode* curNode)
 {
 	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
 	{
-		printInOrder(curNode->getLeftChild());
+		printPostOrder(curNode->getLeftChild());
 	}
 
 	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
 	{
-		printInOrder(curNode->getRightChild());
+		printPostOrder(curNode->getRightChild());
 	}
 
 	cout << *(curNode->getEclipse());
@@ -295,7 +253,7 @@ bool AvlTree::balanceTree(TreeNode* insertedNode) //start from insertion, travel
 
 void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 {
-	TreeNode* parentOfA = nodeA->getParent(); //TODO
+	TreeNode* parentOfA = nodeA->getParent();
 	bool isLeftDecent;
 	if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
 	{
@@ -364,15 +322,15 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA) //In this case, only nodeA, node
 {
 	bool isRoot = (nodeA->getParent() == 0); //Edge case is that nodeA is the tree's root
 	TreeNode* parentOfA;
-	bool isRightDecent; //Because we don't know if nodeA is a left or right child, do a check at runtime
+	bool isRightDescent; //Because we don't know if nodeA is a left or right child, do a check at runtime
 	if (!isRoot)
 	{
 		parentOfA = nodeA->getParent();
 		if (parentOfA->getRightChild()->getKey() == nodeA->getKey())
 		{
-			isRightDecent = true;
+			isRightDescent = true;
 		}
-		else (isRightDecent = false);
+		else (isRightDescent = false);
 	}
 	TreeNode* nodeB = nodeA->getRightChild();
 	TreeNode* lcOfB = nodeB->getLeftChild();
@@ -387,7 +345,7 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA) //In this case, only nodeA, node
 	if (!isRoot) //If nodeA is not the root, assign nodeB's parent and nodeA's parent's child
 	{
 		nodeB->setParent(parentOfA);
-		if (isRightDecent)
+		if (isRightDescent)
 		{
 			parentOfA->setRightChild(nodeB);
 		}
@@ -472,7 +430,7 @@ int main() {
 	myTree->addItem(myEclipse3);
 	myTree->addItem(myEclipse4);
 	myTree->addItem(myEclipse5);
-	/*myTree->addItem(myEclipse6);*/
+	myTree->addItem(myEclipse6);
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();

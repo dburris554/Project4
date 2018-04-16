@@ -31,6 +31,7 @@ public:
 	int getKey();
 	void setBalanceFactor(int myBalanceFactor);
 	int getBalanceFactor();
+	TreeNode* operator=(TreeNode* myNode);
 
 private:
 	TreeNode* parent; //points to parent Node, will be 0 for root node
@@ -138,6 +139,18 @@ void TreeNode::setBalanceFactor(int myBalanceFactor)
 int TreeNode::getBalanceFactor()
 {
 	return balanceFactor;
+}
+
+TreeNode* TreeNode::operator=(TreeNode* myNode)
+{
+	this->balanceFactor = myNode->balanceFactor;
+	this->eclipse = myNode->eclipse;
+	this->key = myNode->key;
+	this->leftChild = myNode->leftChild;
+	this->parent = myNode->parent;
+	this->rightChild = myNode->rightChild;
+	this->successor = myNode->successor;
+	return this;
 }
 //-------------------------------------------------------------
 #endif /* TREENODE_H_ */
