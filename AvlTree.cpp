@@ -295,7 +295,7 @@ bool AvlTree::balanceTree(TreeNode* insertedNode)
 
 void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 {
-	TreeNode* parentOfA = nodeA->getParent();
+	TreeNode* parentOfA = nodeA->getParent(); //TODO
 	bool isLeftDecent;
 	if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
 	{
@@ -323,7 +323,7 @@ void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 	nodeB->setBalanceFactor(0);
 }
 
-void AvlTree::leftInnerRotate(TreeNode* nodeA)
+void AvlTree::leftInnerRotate(TreeNode* nodeA) //TODO
 {
 	TreeNode* parentOfA = nodeA->getParent();
 	bool isLeftDecent;
@@ -362,35 +362,48 @@ void AvlTree::leftInnerRotate(TreeNode* nodeA)
 
 void AvlTree::rightHeavyRotate(TreeNode* nodeA)
 {
-	TreeNode* parentOfA = nodeA->getParent();
+	bool isRoot = (nodeA->getParent() == 0);
+	TreeNode* parentOfA;
 	bool isRightDecent;
-	if (parentOfA->getRightChild()->getKey() == nodeA->getKey())
+	if (!isRoot)
 	{
-		isRightDecent = true;
+		parentOfA = nodeA->getParent();
+		if (parentOfA->getRightChild()->getKey() == nodeA->getKey())
+		{
+			isRightDecent = true;
+		}
+		else (isRightDecent = false);
 	}
-	else (isRightDecent = false);
 	TreeNode* nodeB = nodeA->getRightChild();
 	TreeNode* lcOfB = nodeB->getLeftChild();
 
 	nodeB->setLeftChild(nodeA);
 	nodeA->setParent(nodeB);
 	nodeA->setRightChild(lcOfB);
-	lcOfB->setParent(nodeA);
-	nodeB->setParent(parentOfA);
-	if (isRightDecent)
+	if (lcOfB != 0)
 	{
-		parentOfA->setRightChild(nodeB);
+		lcOfB->setParent(nodeA); //Only point B's left child to A if child exists
 	}
-	else
+	if (!isRoot)
 	{
-		parentOfA->setLeftChild(nodeB);
+		nodeB->setParent(parentOfA);
+		if (isRightDecent)
+		{
+			parentOfA->setRightChild(nodeB);
+		}
+		else
+		{
+			parentOfA->setLeftChild(nodeB);
+		}
 	}
+	else (nodeB->setParent(0)); //nodeB is now the root
+	rootNode = nodeB;
 
 	nodeA->setBalanceFactor(0);
 	nodeB->setBalanceFactor(0);
 }
 
-void AvlTree::rightInnerRotate(TreeNode* nodeA)
+void AvlTree::rightInnerRotate(TreeNode* nodeA) //TODO
 {
 	TreeNode* parentOfA = nodeA->getParent();
 	bool isRightDecent;
