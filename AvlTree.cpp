@@ -16,7 +16,7 @@ AvlTree::~AvlTree() {}
 
 void AvlTree::addItem(Eclipse* myEclipse)
 {
-	//TODO //If no rootNode, add as rootNode. Else, add as regular node
+	//If no rootNode, add as rootNode. Else, add as regular node
 	bool hasRotated = false;
 	if (rootNode == 0)
 	{
@@ -25,24 +25,27 @@ void AvlTree::addItem(Eclipse* myEclipse)
 	else //Find insertion location recursively and insert as non-root node
 	{
 		TreeNode* curNode = rootNode;
+		TreeNode* insertNode = new TreeNode(myEclipse);
 		
 		if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
 		{
 			if (curNode->getRightChild() == 0) //insert here if right child is 0
 			{
 				curNode->setRightChild(new TreeNode(curNode,myEclipse));
-				//Now we check tree for re-balancing
-				hasRotated = balanceTree(curNode->getRightChild());
-				if (!hasRotated)
-				{
-					curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
-				}
+				curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
 				return;
 			}
-			recurseAdd(curNode->getRightChild(),myEclipse,hasRotated);
+
+			recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
+
 			if (!hasRotated)
 			{
 				curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
+			}
+
+			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
+			{
+				hasRotated = balanceTree(insertNode);
 			}
 		}
 		else //otherwise, myEclipse ID should be < curNode's key, so recurse left
@@ -50,61 +53,79 @@ void AvlTree::addItem(Eclipse* myEclipse)
 			if (curNode->getLeftChild() == 0) //insert here if left child is 0
 			{
 				curNode->setLeftChild(new TreeNode(curNode,myEclipse));
-				//Now we check tree for re-balancing
-				hasRotated = balanceTree(curNode->getLeftChild());
-				if (!hasRotated)
-				{
-					curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
-				}
+				curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
 				return;
 			}
-			recurseAdd(curNode->getLeftChild(),myEclipse,hasRotated);
+
+			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
+
 			if (!hasRotated)
 			{
 				curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
+			}
+
+			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
+			{
+				hasRotated = balanceTree(insertNode);
 			}
 		}
 	}
 }
 
-void AvlTree::recurseAdd(TreeNode* curNode, Eclipse* myEclipse, bool &hasRotated)
+void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEclipse, bool &hasRotated)
 {
 	if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
 	{
 		if (curNode->getRightChild() == 0) //insert here if right child is 0
 		{
-			curNode->setRightChild(new TreeNode(curNode,myEclipse));
-			//Now we check tree for re-balancing
-			hasRotated = balanceTree(curNode->getRightChild());
-			if (!hasRotated)
+			curNode->setRightChild(insertNode);
+			insertNode->setParent(curNode);
+			curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
+
+			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing? May not have to
 			{
-				curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
+				hasRotated = balanceTree(insertNode);
 			}
 			return;
 		}
-		recurseAdd(curNode->getRightChild(),myEclipse,hasRotated);
+
+		recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
+
 		if (!hasRotated)
 		{
 			curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
+		}
+
+		if (abs(curNode->getBalanceFactor()) == 2)
+		{
+			hasRotated = balanceTree(insertNode);
 		}
 	}
 	else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 	{
 		if (curNode->getLeftChild() == 0) //insert here if left child is 0
 		{
-			curNode->setLeftChild(new TreeNode(curNode,myEclipse));
-			//Now we check tree for re-balancing
-			hasRotated = balanceTree(curNode->getLeftChild());
-			if (!hasRotated)
+			curNode->setLeftChild(insertNode);
+			insertNode->setParent(curNode);
+			curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
+
+			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing? May not have to
 			{
-				curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
+				hasRotated = balanceTree(insertNode);
 			}
 			return;
 		}
-		recurseAdd(curNode->getLeftChild(),myEclipse,hasRotated);
+
+		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
+
 		if (!hasRotated)
 		{
 			curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
+		}
+
+		if (abs(curNode->getBalanceFactor()) == 2)
+		{
+			hasRotated = balanceTree(insertNode);
 		}
 	}
 }
@@ -284,9 +305,10 @@ void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 	TreeNode* nodeB = nodeA->getLeftChild();
 	TreeNode* rcOfB = nodeB->getRightChild();
 
-	nodeA->setParent(nodeB);
 	nodeB->setRightChild(nodeA);
+	nodeA->setParent(nodeB);
 	nodeA->setLeftChild(rcOfB);
+	rcOfB->setParent(nodeA);
 	nodeB->setParent(parentOfA);
 	if (isLeftDecent)
 	{
@@ -303,7 +325,39 @@ void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 
 void AvlTree::leftInnerRotate(TreeNode* nodeA)
 {
-	//TODO
+	TreeNode* parentOfA = nodeA->getParent();
+	bool isLeftDecent;
+	if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
+	{
+		isLeftDecent = true;
+	}
+	else (isLeftDecent = false);
+	TreeNode* nodeB = nodeA->getLeftChild();
+	TreeNode* nodeC = nodeB->getRightChild();
+	TreeNode* lcOfC = nodeC->getLeftChild();
+	TreeNode* rcOfC = nodeC->getRightChild();
+
+	nodeC->setLeftChild(nodeB);
+	nodeB->setParent(nodeC);
+	nodeC->setRightChild(nodeA);
+	nodeA->setParent(nodeC);
+	nodeB->setRightChild(lcOfC);
+	lcOfC->setParent(nodeB);
+	nodeA->setLeftChild(rcOfC);
+	rcOfC->setParent(nodeA);
+	nodeC->setParent(parentOfA);
+	if (isLeftDecent)
+	{
+		parentOfA->setLeftChild(nodeC);
+	}
+	else
+	{
+		parentOfA->setRightChild(nodeC);
+	}
+
+	nodeA->setBalanceFactor(0);
+	nodeB->setBalanceFactor(0);
+	nodeC->setBalanceFactor(0);
 }
 
 void AvlTree::rightHeavyRotate(TreeNode* nodeA)
@@ -318,9 +372,10 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA)
 	TreeNode* nodeB = nodeA->getRightChild();
 	TreeNode* lcOfB = nodeB->getLeftChild();
 
-	nodeA->setParent(nodeB);
 	nodeB->setLeftChild(nodeA);
+	nodeA->setParent(nodeB);
 	nodeA->setRightChild(lcOfB);
+	lcOfB->setParent(nodeA);
 	nodeB->setParent(parentOfA);
 	if (isRightDecent)
 	{
@@ -337,7 +392,39 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA)
 
 void AvlTree::rightInnerRotate(TreeNode* nodeA)
 {
-	//TODO
+	TreeNode* parentOfA = nodeA->getParent();
+	bool isRightDecent;
+	if (parentOfA->getRightChild()->getKey() == nodeA->getKey())
+	{
+		isRightDecent = true;
+	}
+	else (isRightDecent = false);
+	TreeNode* nodeB = nodeA->getRightChild();
+	TreeNode* nodeC = nodeB->getLeftChild();
+	TreeNode* lcOfC = nodeC->getLeftChild();
+	TreeNode* rcOfC = nodeC->getRightChild();
+
+	nodeC->setLeftChild(nodeA);
+	nodeA->setParent(nodeC);
+	nodeC->setRightChild(nodeB);
+	nodeB->setParent(nodeC);
+	nodeA->setRightChild(lcOfC);
+	lcOfC->setParent(nodeA);
+	nodeB->setLeftChild(rcOfC);
+	rcOfC->setParent(nodeB);
+	nodeC->setParent(parentOfA);
+	if (isRightDecent)
+	{
+		parentOfA->setRightChild(nodeC);
+	}
+	else
+	{
+		parentOfA->setLeftChild(nodeC);
+	}
+
+	nodeA->setBalanceFactor(0);
+	nodeB->setBalanceFactor(0);
+	nodeC->setBalanceFactor(0);
 }
 //----------------------------------------------------------------
 int main() {
@@ -367,9 +454,9 @@ int main() {
 	myTree->addItem(myEclipse1);
 	myTree->addItem(myEclipse2);
 	myTree->addItem(myEclipse3);
-	myTree->addItem(myEclipse4);
+	/*myTree->addItem(myEclipse4);
 	myTree->addItem(myEclipse5);
-	myTree->addItem(myEclipse6);
+	myTree->addItem(myEclipse6);*/
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();
