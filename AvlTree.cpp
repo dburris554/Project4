@@ -127,7 +127,96 @@ TreeNode* AvlTree::getRootNode()
 
 void AvlTree::removeItem(Eclipse* myEclipse)
 {
-	//TODO
+	//TODO make 3 methods to cover the 3 removal cases: leaf node, node with 1 child, node with 2 children
+	
+	TreeNode* delNode = findNode(myEclipse.getID());
+	
+	//Leaf Node case
+	if (delNode.getLeftChild() == 0 && delNode.getRightChild() == 0) //delNode is a leaf node
+	{
+		if (delNode.getParent() == 0) //delnode is the root
+		{
+			delNode = 0;
+		}
+		else //delnode has a parent
+		{
+			if (delNode.getKey() == delNode.getParent().getLeftChild().getKey()) //delNode is a left child
+			{
+				delNode.getParent().setLeftChild(0);
+				delNode = 0;
+			}
+			else //otherwise, delnode is a right child
+			{
+				delNode.getParent().setRightChild(0);
+				delNode = 0;
+			}
+		}
+	}
+	
+	//doubble child case
+	if (delNode.getLeftChild() != 0 && delNode.getRightChild() != 0) //delNode has two children!
+	{
+		succNode = delNode.getRightChild(); //start the search for successor at delNode's right child and recurse left
+		while (succNode.getLeftChild != 0)
+		{
+			succNode = succNode.getLeftChild();
+		}
+		
+		delNode.setEclipse(succNode.getEclipse()); //assign delNode as Successor
+		removeItem(succNode.getEclipse()); //recurse to delete successor Node
+		
+	}
+	
+	//single child case, only check if the child is left or right and if delNode has a parent
+	bool hasLeftChild = (delNode.getLeftChild() != 0);
+	
+	if (delNode.getParent() == 0) //delNode is root
+	{
+		if (hasLeftChild)
+		{
+			rootNode = delNode.getLeftChild();
+			delNode = 0;
+		}
+		else
+		{
+			rootNode = delNode.getRightChild();
+			delNode = 0;
+		}
+	}
+	else //delNode has a parent
+	{
+		bool isLeftChild = (delNode.getKey() == delNode.getParent().getLeftChild().getKey());
+		
+		TreeNode* parent = delNode.getParent();
+		if (isLeftChild)
+		{
+			if (hasLeftChild)
+			{
+				parent.setLeftChild(delNode.getLeftChild());
+				parent.getLeftChild().setParent(parent);
+			}
+			else
+			{
+				parent.setLeftChild(delNode.getRightChild());
+				parent.getLeftChild().setParent(parent);
+			}
+		}
+		else //delNode is a right child
+		{
+			if (hasLeftChild)
+			{
+				parent.setRightChild(delNode.getLeftChild());
+				parent.getRightChild().setParent(parent);
+			}
+			else
+			{
+				parent.setRightChild(delNode.getRightChild());
+				parent.getRightChild().setParent(parent);
+			}
+		}
+		//Parent to delNode-child relations have been formed, now delete delNode
+		delNode = 0;
+	}
 }
 
 Eclipse* AvlTree::findEclipse(int key)
