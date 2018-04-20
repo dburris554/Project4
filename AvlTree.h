@@ -18,6 +18,8 @@ public:
 	virtual ~AvlTree();
 	void addItem(Eclipse* myEclipse);
 	TreeNode* getRootNode();
+	TreeNode* getFoundNode();
+	void setFoundNode(TreeNode* myFoundNode);
 	void removeItem(Eclipse* myEclipse); //you can remove a node with an eclipse or key
 	Eclipse* findEclipse(int key);
 	TreeNode* findNode(int key);
@@ -37,7 +39,9 @@ private:
 	void printInOrder(TreeNode* curNode); //recurse print in-order
 	void printPostOrder(TreeNode* curNode); //recurse print post-order
 	void copyToArray(ResizeableArray<Eclipse>& myEclipses, TreeNode* firstNode);
+	void find(TreeNode* curNode, int key);
 	TreeNode* rootNode;
+	TreeNode* foundNode;
 };
 
 #endif /* AVLTREE_H_ */

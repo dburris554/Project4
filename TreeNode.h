@@ -15,8 +15,10 @@ using namespace std;
 class TreeNode {
 
 public:
+	TreeNode();
 	TreeNode(Eclipse* myEclipse);
 	TreeNode(TreeNode* parentNode,Eclipse* myEclipse);
+	TreeNode(const TreeNode& oldNode);
 	virtual ~TreeNode();
 	void setParent(TreeNode* myParent);
 	TreeNode* getParent();
@@ -31,7 +33,7 @@ public:
 	int getKey();
 	void setBalanceFactor(int myBalanceFactor);
 	int getBalanceFactor();
-	TreeNode* operator=(TreeNode* myNode);
+	TreeNode* operator=(const TreeNode& myNode);
 
 private:
 	TreeNode* parent; //points to parent Node, will be 0 for root node
@@ -42,6 +44,16 @@ private:
 	int balanceFactor; //upon insertion and deletion, re-do balanceFactor
 };
 //-------------------------------------------------------------
+TreeNode::TreeNode() //used to make invalid node
+{
+	parent = 0;
+	leftChild = 0;
+	rightChild = 0;
+	eclipse = new Eclipse();
+	key = 0;
+	balanceFactor = 0;
+}
+
 TreeNode::TreeNode(Eclipse* myEclipse) //used to initialize root node
 {
 	parent = 0;
@@ -69,6 +81,16 @@ TreeNode::TreeNode(TreeNode* parentNode, Eclipse* myEclipse) //used to initializ
 	{
 		parent->setLeftChild(this);
 	}
+}
+
+TreeNode::TreeNode(const TreeNode& oldNode)
+{
+	this->balanceFactor = oldNode.balanceFactor;
+	this->eclipse = oldNode.eclipse;
+	this->key = oldNode.key;
+	this->leftChild = oldNode.leftChild;
+	this->parent = oldNode.parent;
+	this->rightChild = oldNode.rightChild;
 }
 
 TreeNode::~TreeNode() {}
@@ -128,14 +150,14 @@ int TreeNode::getBalanceFactor()
 	return balanceFactor;
 }
 
-TreeNode* TreeNode::operator=(TreeNode* myNode)
+TreeNode* TreeNode::operator=(const TreeNode& myNode)
 {
-	this->balanceFactor = myNode->balanceFactor;
-	this->eclipse = myNode->eclipse;
-	this->key = myNode->key;
-	this->leftChild = myNode->leftChild;
-	this->parent = myNode->parent;
-	this->rightChild = myNode->rightChild;
+	this->balanceFactor = myNode.balanceFactor;
+	this->eclipse = myNode.eclipse;
+	this->key = myNode.key;
+	this->leftChild = myNode.leftChild;
+	this->parent = myNode.parent;
+	this->rightChild = myNode.rightChild;
 	return this;
 }
 //-------------------------------------------------------------

@@ -10,6 +10,7 @@
 AvlTree::AvlTree()
 {
 	rootNode = 0;
+	foundNode = 0;
 }
 
 AvlTree::~AvlTree() {}
@@ -125,93 +126,108 @@ TreeNode* AvlTree::getRootNode()
 	return rootNode;
 }
 
+TreeNode* AvlTree::getFoundNode()
+{
+	return foundNode;
+}
+
+void AvlTree::setFoundNode(TreeNode* myFoundNode)
+{
+	foundNode = myFoundNode;
+}
+
 void AvlTree::removeItem(Eclipse* myEclipse)
 {
 	//TODO make 3 methods to cover the 3 removal cases: leaf node, node with 1 child, node with 2 children
 	
-	TreeNode* delNode = findNode(myEclipse.getID());
+	TreeNode* delNode = findNode(myEclipse->getID());
+	if (delNode->getEclipse()->getIsBlank()) //If an invalid node, cerr and return
+	{
+		cerr << "This item does not exist!" << endl;
+		return;
+	}
 	
 	//Leaf Node case
-	if (delNode.getLeftChild() == 0 && delNode.getRightChild() == 0) //delNode is a leaf node
+	if (delNode->getLeftChild() == 0 && delNode->getRightChild() == 0) //delNode is a leaf node
 	{
-		if (delNode.getParent() == 0) //delnode is the root
+		if (delNode->getParent() == 0) //delnode is the root
 		{
 			delNode = 0;
 		}
 		else //delnode has a parent
 		{
-			if (delNode.getKey() == delNode.getParent().getLeftChild().getKey()) //delNode is a left child
+			if (delNode->getKey() == delNode->getParent()->getLeftChild()->getKey()) //delNode is a left child
 			{
-				delNode.getParent().setLeftChild(0);
+				delNode->getParent()->setLeftChild(0);
 				delNode = 0;
 			}
 			else //otherwise, delnode is a right child
 			{
-				delNode.getParent().setRightChild(0);
+				delNode->getParent()->setRightChild(0);
 				delNode = 0;
 			}
 		}
 	}
 	
-	//doubble child case
-	if (delNode.getLeftChild() != 0 && delNode.getRightChild() != 0) //delNode has two children!
+	//double child case
+	if (delNode->getLeftChild() != 0 && delNode->getRightChild() != 0) //delNode has two children
 	{
-		succNode = delNode.getRightChild(); //start the search for successor at delNode's right child and recurse left
-		while (succNode.getLeftChild != 0)
+		TreeNode* succNode = delNode->getRightChild(); //start the search for successor at delNode's right child and recurse left
+		while (succNode->getLeftChild() != 0)
 		{
-			succNode = succNode.getLeftChild();
+			succNode = succNode->getLeftChild();
 		}
 		
-		delNode.setEclipse(succNode.getEclipse()); //assign delNode as Successor
-		removeItem(succNode.getEclipse()); //recurse to delete successor Node
+		delNode->setEclipse(succNode->getEclipse()); //assign delNode as Successor
+		removeItem(succNode->getEclipse()); //recurse to delete successor Node
 		
 	}
 	
 	//single child case, only check if the child is left or right and if delNode has a parent
-	bool hasLeftChild = (delNode.getLeftChild() != 0);
+	bool hasLeftChild = (delNode->getLeftChild() != 0);
 	
-	if (delNode.getParent() == 0) //delNode is root
+	if (delNode->getParent() == 0) //delNode is root
 	{
 		if (hasLeftChild)
 		{
-			rootNode = delNode.getLeftChild();
+			rootNode = delNode->getLeftChild();
 			delNode = 0;
 		}
 		else
 		{
-			rootNode = delNode.getRightChild();
+			rootNode = delNode->getRightChild();
 			delNode = 0;
 		}
 	}
 	else //delNode has a parent
 	{
-		bool isLeftChild = (delNode.getKey() == delNode.getParent().getLeftChild().getKey());
+		bool isLeftChild = (delNode->getKey() == delNode->getParent()->getLeftChild()->getKey());
 		
-		TreeNode* parent = delNode.getParent();
+		TreeNode* parent = delNode->getParent();
 		if (isLeftChild)
 		{
 			if (hasLeftChild)
 			{
-				parent.setLeftChild(delNode.getLeftChild());
-				parent.getLeftChild().setParent(parent);
+				parent->setLeftChild(delNode->getLeftChild());
+				parent->getLeftChild()->setParent(parent);
 			}
 			else
 			{
-				parent.setLeftChild(delNode.getRightChild());
-				parent.getLeftChild().setParent(parent);
+				parent->setLeftChild(delNode->getRightChild());
+				parent->getLeftChild()->setParent(parent);
 			}
 		}
 		else //delNode is a right child
 		{
 			if (hasLeftChild)
 			{
-				parent.setRightChild(delNode.getLeftChild());
-				parent.getRightChild().setParent(parent);
+				parent->setRightChild(delNode->getLeftChild());
+				parent->getRightChild()->setParent(parent);
 			}
 			else
 			{
-				parent.setRightChild(delNode.getRightChild());
-				parent.getRightChild().setParent(parent);
+				parent->setRightChild(delNode->getRightChild());
+				parent->getRightChild()->setParent(parent);
 			}
 		}
 		//Parent to delNode-child relations have been formed, now delete delNode
@@ -219,14 +235,48 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 	}
 }
 
-Eclipse* AvlTree::findEclipse(int key)
+Eclipse* AvlTree::findEclipse(int key) //will return an invalid Eclipse if not found
 {
-	//TODO
+	TreeNode* curNode = rootNode;
+	find(curNode,key);
+	return foundNode->getEclipse();
 }
 
-TreeNode* AvlTree::findNode(int key)
+TreeNode* AvlTree::findNode(int key) //will return an invalid TreeNode if not found
 {
-	//TODO
+	TreeNode* curNode = rootNode;
+	find(curNode,key);
+	return foundNode;
+}
+
+void AvlTree::find(TreeNode* curNode, int key)
+{
+	if (curNode->getKey() < key) //first check to recurse right
+	{
+		if (curNode->getRightChild() != 0) //then make sure the right child exists
+		{
+			find(curNode->getRightChild(),key);
+			return;
+		}
+	}
+	else if (curNode->getKey() > key)//next check to recurse left
+	{
+		if (curNode->getLeftChild() != 0) //then check to see if left child exists
+		{
+			find(curNode->getLeftChild(),key);
+			return;
+		}
+	}
+
+	if (curNode->getKey() == key) //check if curNode is a match
+	{
+		this->setFoundNode(curNode);
+	}
+	else
+	{
+		this->setFoundNode(new TreeNode());
+	}
+	return;
 }
 
 void AvlTree::printPreOrder()
@@ -533,10 +583,21 @@ int main() {
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();
-	cout << "Printing In-Order..." << endl;
+	/*cout << "Printing In-Order..." << endl;
 	myTree->printInOrder();
 	cout << "Printing Post-Order..." << endl;
-	myTree->printPostOrder();
+	myTree->printPostOrder();*/
+
+	Eclipse* testEclipse = myTree->findEclipse(7);
+	if (!testEclipse->getIsBlank())
+	{
+		cout << endl << *(testEclipse);
+	}
+	else
+	{
+		cout << endl << "TestEclipse is an invalid Eclipse." << endl;
+	}
+
 	cout << "Done.";
 
 
