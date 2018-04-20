@@ -23,6 +23,7 @@ public:
 	void removeItem(Eclipse* myEclipse); //you can remove a node with an eclipse or key
 	Eclipse* findEclipse(int key);
 	TreeNode* findNode(int key);
+	TreeNode* findNodeForRemoval(int key);
 	void printPreOrder();
 	void printInOrder();
 	void printPostOrder();
@@ -39,7 +40,7 @@ private:
 	void printInOrder(TreeNode* curNode); //recurse print in-order
 	void printPostOrder(TreeNode* curNode); //recurse print post-order
 	void copyToArray(ResizeableArray<Eclipse>& myEclipses, TreeNode* firstNode);
-	void find(TreeNode* curNode, int key);
+	void find(TreeNode* curNode, int key, bool &forRemoval);
 	TreeNode* rootNode;
 	TreeNode* foundNode;
 };
