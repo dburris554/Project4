@@ -10,7 +10,7 @@
 AvlTree::AvlTree()
 {
 	rootNode = 0;
-	foundNode = 0;
+	tempNode = 0;
 }
 
 AvlTree::~AvlTree() {}
@@ -18,7 +18,6 @@ AvlTree::~AvlTree() {}
 void AvlTree::addItem(Eclipse* myEclipse)
 {
 	//If no rootNode, add as rootNode. Else, add as regular node
-	bool hasRotated = false;
 	if (rootNode == 0)
 	{
 		rootNode = new TreeNode(myEclipse);
@@ -37,17 +36,9 @@ void AvlTree::addItem(Eclipse* myEclipse)
 				return;
 			}
 
-			recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
-			//After right recursion return, update balanceFactor based on right branch insertion
-			if (!hasRotated) //only update bF if not rotated and if insertNode is a single child
-			{
-				curNode->setBalanceFactor(computeBalanceFactor(curNode));
-			}
-
-			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
-			{
-				hasRotated = updateTree(foundNode);
-			}
+			recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
+			//After right recursion return, update tree's bF's and rotations
+			updateTree(tempNode);
 		}
 		else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 		{
@@ -58,22 +49,14 @@ void AvlTree::addItem(Eclipse* myEclipse)
 				return;
 			}
 
-			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
-			//After left recursion return, update balanceFactor based on left branch insertion
-			if (!hasRotated) //only update bF if not rotated and if insertNode is a single child
-			{
-				curNode->setBalanceFactor(computeBalanceFactor(curNode));
-			}
-
-			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
-			{
-				hasRotated = updateTree(foundNode);
-			}
+			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
+			//After left recursion return, update tree's bF's and rotations
+			updateTree(tempNode);
 		}
 	}
 }
 
-void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEclipse, bool &hasRotated)
+void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEclipse)
 {
 	if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
 	{
@@ -81,22 +64,12 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 		{
 			curNode->setRightChild(insertNode); //when assigning insertNode, need to assign parent relation
 			insertNode->setParent(curNode);
-			curNode->setBalanceFactor(computeBalanceFactor(curNode));
-			foundNode = curNode;
+			tempNode = curNode;
 			return;
 		}
+		recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
 
-		recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
-		//After right recursion return, update balanceFactor based on right branch insertion
-		if (!hasRotated)
-		{
-			curNode->setBalanceFactor(computeBalanceFactor(curNode)); //Only update if lower branch hasn't rotated
-		}
-
-		if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
-		{
-			hasRotated = updateTree(foundNode);
-		}
+		return;
 	}
 	else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 	{
@@ -104,22 +77,12 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 		{
 			curNode->setLeftChild(insertNode);
 			insertNode->setParent(curNode);
-			curNode->setBalanceFactor(computeBalanceFactor(curNode));
-			foundNode = curNode;
+			tempNode = curNode;
 			return;
 		}
+		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
 
-		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
-		//After left recursion return, update balanceFactor based on left branch insertion
-		if (!hasRotated)
-		{
-			curNode->setBalanceFactor(computeBalanceFactor(curNode)); //Only update if lower branch hasn't rotated
-		}
-
-		if (abs(curNode->getBalanceFactor()) == 2)
-		{
-			hasRotated = updateTree(foundNode); //check for re-balancing
-		}
+		return;
 	}
 }
 
@@ -128,21 +91,21 @@ TreeNode* AvlTree::getRootNode()
 	return rootNode;
 }
 
-TreeNode* AvlTree::getFoundNode()
+TreeNode* AvlTree::getTempNode()
 {
-	return foundNode;
+	return tempNode;
 }
 
-void AvlTree::setFoundNode(TreeNode* myFoundNode)
+void AvlTree::setTempNode(TreeNode* myFoundNode)
 {
-	foundNode = myFoundNode;
+	tempNode = myFoundNode;
 }
 
 void AvlTree::removeItem(Eclipse* myEclipse)
 {
 	//TODO make 3 methods to cover the 3 removal cases: leaf node, node with 1 child, node with 2 children
 	
-	TreeNode* delNode = findNodeForRemoval(myEclipse->getID());
+	TreeNode* delNode = findNode(myEclipse->getID());
 	if (delNode->getEclipse()->getIsBlank()) //If an invalid node, cerr and return
 	{
 		cerr << "This item does not exist!" << endl;
@@ -160,17 +123,17 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 		{
 			if (delNode->getKey() == delNode->getParent()->getLeftChild()->getKey()) //delNode is a left child
 			{
-				updateTree(delNode);
 				delNode->getParent()->setLeftChild(0);
+				tempNode = delNode->getParent();
 				delNode = 0;
-
+				updateTree(tempNode);
 			}
 			else //otherwise, delnode is a right child
 			{
-				updateTree(delNode);
 				delNode->getParent()->setRightChild(0);
+				tempNode = delNode->getParent();
 				delNode = 0;
-
+				updateTree(tempNode);
 			}
 		}
 	}
@@ -210,9 +173,9 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 		else //delNode has a parent
 		{
 			bool isLeftChild = (delNode->getKey() == delNode->getParent()->getLeftChild()->getKey());
-
 			TreeNode* parent = delNode->getParent();
-			if (isLeftChild)
+
+			if (isLeftChild) //if delNode is a left child...
 			{
 				if (hasLeftChild)
 				{
@@ -225,7 +188,7 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 					parent->getLeftChild()->setParent(parent);
 				}
 			}
-			else //delNode is a right child
+			else //else delNode is a right child
 			{
 				if (hasLeftChild)
 				{
@@ -239,8 +202,8 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 				}
 			}
 			//Parent to delNode-child relations have been formed, now delete delNode
-			updateTree(delNode);
 			delNode = 0;
+			updateTree(parent);
 		}
 	}
 }
@@ -248,25 +211,15 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 Eclipse* AvlTree::findEclipse(int key) //will return an invalid Eclipse if not found
 {
 	TreeNode* curNode = rootNode;
-	bool forRemoval = false;
-	find(curNode,key,forRemoval);
-	return foundNode->getEclipse();
+	find(curNode,key);
+	return tempNode->getEclipse();
 }
 
 TreeNode* AvlTree::findNode(int key) //will return an invalid TreeNode if not found
 {
 	TreeNode* curNode = rootNode;
-	bool forRemoval = false;
 	find(curNode,key);
-	return foundNode;
-}
-
-TreeNode* AvlTree::findNodeForRemoval(int key)
-{
-	TreeNode* curNode = rootNode;
-	bool forRemoval = true;
-	find(curNode,key,forRemoval);
-	return foundNode;
+	return tempNode;
 }
 
 void AvlTree::find(TreeNode* curNode, int key)
@@ -290,16 +243,16 @@ void AvlTree::find(TreeNode* curNode, int key)
 
 	if (curNode->getKey() == key) //check if curNode is a match
 	{
-		this->setFoundNode(curNode);
+		tempNode = curNode;
 	}
 	else
 	{
-		this->setFoundNode(new TreeNode());
+		tempNode = new TreeNode();
 	}
 	return;
 }
 
-int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a new bF
+int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a new balanceFactor
 {
 	int leftDepth = -1;
 	int rightDepth = -1;
@@ -307,7 +260,7 @@ int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a ne
 	return (leftDepth - rightDepth);
 }
 
-void AvlTree::computeBalanceFactor(TreeNode* myNode, int &leftDepth, int &rightDepth)
+void AvlTree::computeBalanceFactor(TreeNode* myNode, int &leftDepth, int &rightDepth) //TODO solve infinite loop
 {
 	//first compute left depth. If either child are valid, keep going
 	if (leftDepth == -1) //only perform this once
@@ -434,58 +387,57 @@ void AvlTree::copyToArray(ResizeableArray<Eclipse> &myEclipses, TreeNode* firstN
 	}
 }
 
-bool AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel up the parents to check for rotation cases
+void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel up the parents to check for rotation cases
 {
-	TreeNode* curNode = insertedNode->getParent();
+	TreeNode* curNode = insertedNode->getParent(); //we start at the parent of the node that was added/removed
 	curNode->setBalanceFactor(computeBalanceFactor(curNode));
-	bool isLeftChild = (insertedNode->getParent()->getLeftChild()->getKey() == insertedNode->getKey());
+	bool hasLeftChild = (insertedNode->getLeftChild() != 0);
 
-	if (abs(insertedNode->getParent()->getBalanceFactor()) == 2
-			&& insertedNode->getParent()->hasTwoChildren()
-			&& insertedNode->getBalanceFactor() == 0) //special case during removal at inserted node where we should start at sibling
+	if (abs(insertedNode->getBalanceFactor()) == 2 && (insertedNode->getLeftChild() != 0 || insertedNode->getRightChild() != 0))
+	//special case during removal @ delNode's parent where we should start at sibling
 	{
-		if (isLeftChild)
+		if (hasLeftChild)
 		{
-			return updateTree(insertedNode->getParent()->getRightChild()); //restart the balance op at the node that will catch the rotation
+			updateTree(insertedNode->getRightChild());
 		}
-		else //otherwise, insertedNode is a right child
+		else //otherwise, insertedNode has a right child
 		{
-			return updateTree(insertedNode->getParent()->getLeftChild());
+			updateTree(insertedNode->getLeftChild());
 		}
-	}
+	}	//above will restart at the node that will catch the rotation
 
-	while (curNode->getParent() != 0) //continue until you reach the head node
+	while (curNode->getParent() != 0) //continue updating and checking rotations until you reach the head node
 	{
-		curNode->getParent()->setBalanceFactor(computeBalanceFactor(curNode));
+		curNode->getParent()->setBalanceFactor(computeBalanceFactor(curNode->getParent())); //update parent's bF before checking for rotation
+
 		//Test for Left-Heavy rotation
 		if (curNode->getBalanceFactor() == 1 && curNode->getParent()->getBalanceFactor() == 2)
 		{
 			leftHeavyRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
-			return true;
+			return;
 		}
 		//Test for Left-Inner rotation
 		else if (curNode->getBalanceFactor() == -1 && curNode->getParent()->getBalanceFactor() == 2)
 		{
 			leftInnerRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
-			return true;
+			return;
 		}
 		//Test for Right-Heavy rotation
 		else if (curNode->getBalanceFactor() == -1 && curNode->getParent()->getBalanceFactor() == -2)
 		{
 			rightHeavyRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
-			return true;
+			return;
 		}
 		//Test for Right-Inner rotation
 		else if (curNode->getBalanceFactor() == 1 && curNode->getParent()->getBalanceFactor() == -2)
 		{
 			rightInnerRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
-			return true;
+			return;
 		}
 		//recurse up to the next parent
 		curNode = curNode->getParent();
 	}
-	//If went up to parent and no rotations, return false
-	return false;
+	return;
 }
 
 void AvlTree::leftHeavyRotate(TreeNode* nodeA)

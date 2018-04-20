@@ -26,12 +26,9 @@ public:
 	TreeNode* getLeftChild();
 	void setRightChild(TreeNode* myRightChild);
 	TreeNode* getRightChild();
-	void setSuccessor(TreeNode* mySuccessor);
-	TreeNode* getSuccessor();
 	void setEclipse(Eclipse* myEclipse);
 	Eclipse* getEclipse();
 	int getKey();
-	bool hasTwoChildren();
 	void setBalanceFactor(int myBalanceFactor);
 	int getBalanceFactor();
 	TreeNode* operator=(const TreeNode& myNode);
@@ -139,18 +136,6 @@ Eclipse* TreeNode::getEclipse()
 int TreeNode::getKey()
 {
 	return key;
-}
-
-bool TreeNode::hasTwoChildren()
-{
-	if (rightChild != 0 && leftChild != 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
 }
 
 void TreeNode::setBalanceFactor(int myBalanceFactor)
