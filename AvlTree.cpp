@@ -39,14 +39,14 @@ void AvlTree::addItem(Eclipse* myEclipse)
 
 			recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
 			//After right recursion return, update balanceFactor based on right branch insertion
-			if (!hasRotated && !(insertNode->getParent()->hasTwoChildren())) //only update bF if not rotated and if insertNode is a single child
+			if (!hasRotated && !(foundNode->hasTwoChildren())) //only update bF if not rotated and if insertNode is a single child
 			{
 				curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
 			}
 
 			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
 			{
-				hasRotated = balanceTree(insertNode->getParent());
+				hasRotated = balanceTree(foundNode);
 			}
 		}
 		else //otherwise, myEclipse ID should be < curNode's key, so recurse left
@@ -60,14 +60,14 @@ void AvlTree::addItem(Eclipse* myEclipse)
 
 			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
 			//After left recursion return, update balanceFactor based on left branch insertion
-			if (!hasRotated && !(insertNode->getParent()->hasTwoChildren())) //only update bF if not rotated and if insertNode is a single child
+			if (!hasRotated && !(foundNode->hasTwoChildren())) //only update bF if not rotated and if insertNode is a single child
 			{
 				curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
 			}
 
 			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
 			{
-				hasRotated = balanceTree(insertNode->getParent());
+				hasRotated = balanceTree(foundNode);
 			}
 		}
 	}
@@ -82,19 +82,20 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 			curNode->setRightChild(insertNode); //when assigning insertNode, need to assign parent relation
 			insertNode->setParent(curNode);
 			curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
+			foundNode = curNode;
 			return;
 		}
 
 		recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
 		//After right recursion return, update balanceFactor based on right branch insertion
-		if (!hasRotated && !(insertNode->getParent()->hasTwoChildren()))
+		if (!hasRotated && !(foundNode->hasTwoChildren()))
 		{
 			curNode->setBalanceFactor(curNode->getBalanceFactor() - 1); //Only update if lower branch hasn't rotated
 		}
 
 		if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
 		{
-			hasRotated = balanceTree(insertNode->getParent());
+			hasRotated = balanceTree(foundNode);
 		}
 	}
 	else //otherwise, myEclipse ID should be < curNode's key, so recurse left
@@ -104,19 +105,20 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 			curNode->setLeftChild(insertNode);
 			insertNode->setParent(curNode);
 			curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
+			foundNode = curNode;
 			return;
 		}
 
 		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
 		//After left recursion return, update balanceFactor based on left branch insertion
-		if (!hasRotated && !(insertNode->getParent()->hasTwoChildren()))
+		if (!hasRotated && !(foundNode->hasTwoChildren()))
 		{
 			curNode->setBalanceFactor(curNode->getBalanceFactor() + 1); //Only update if lower branch hasn't rotated
 		}
 
 		if (abs(curNode->getBalanceFactor()) == 2)
 		{
-			hasRotated = balanceTree(insertNode->getParent()); //check for re-balancing
+			hasRotated = balanceTree(foundNode); //check for re-balancing
 		}
 	}
 }
