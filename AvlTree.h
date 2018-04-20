@@ -41,6 +41,8 @@ private:
 	void printPostOrder(TreeNode* curNode); //recurse print post-order
 	void copyToArray(ResizeableArray<Eclipse>& myEclipses, TreeNode* firstNode);
 	void find(TreeNode* curNode, int key, bool &forRemoval);
+	int computeBalanceFactor(TreeNode* myNode);
+	void computeBalanceFactor(TreeNode* myNode, int &leftDepth, int &rightDepth);
 	TreeNode* rootNode;
 	TreeNode* foundNode;
 };

@@ -33,15 +33,15 @@ void AvlTree::addItem(Eclipse* myEclipse)
 			if (curNode->getRightChild() == 0) //insert here if right child is 0
 			{
 				curNode->setRightChild(new TreeNode(curNode,myEclipse)); //don't use insertNode here to avoid extra line
-				curNode->setBalanceFactor(curNode->getBalanceFactor() - 1); //guaranteed no rotations will happen here
+				curNode->setBalanceFactor(computeBalanceFactor(curNode)); //guaranteed no rotations will happen here
 				return;
 			}
 
 			recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
 			//After right recursion return, update balanceFactor based on right branch insertion
-			if (!hasRotated && !(foundNode->hasTwoChildren())) //only update bF if not rotated and if insertNode is a single child
+			if (!hasRotated) //only update bF if not rotated and if insertNode is a single child
 			{
-				curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
+				curNode->setBalanceFactor(computeBalanceFactor(curNode));
 			}
 
 			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
@@ -54,15 +54,15 @@ void AvlTree::addItem(Eclipse* myEclipse)
 			if (curNode->getLeftChild() == 0) //insert here if left child is 0
 			{
 				curNode->setLeftChild(new TreeNode(curNode,myEclipse)); //Don't use insertNode until recurseAdd
-				curNode->setBalanceFactor(curNode->getBalanceFactor() + 1); //guaranteed no rotation will happen here
+				curNode->setBalanceFactor(computeBalanceFactor(curNode)); //guaranteed no rotation will happen here
 				return;
 			}
 
 			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
 			//After left recursion return, update balanceFactor based on left branch insertion
-			if (!hasRotated && !(foundNode->hasTwoChildren())) //only update bF if not rotated and if insertNode is a single child
+			if (!hasRotated) //only update bF if not rotated and if insertNode is a single child
 			{
-				curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
+				curNode->setBalanceFactor(computeBalanceFactor(curNode));
 			}
 
 			if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
@@ -81,16 +81,16 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 		{
 			curNode->setRightChild(insertNode); //when assigning insertNode, need to assign parent relation
 			insertNode->setParent(curNode);
-			curNode->setBalanceFactor(curNode->getBalanceFactor() - 1);
+			curNode->setBalanceFactor(computeBalanceFactor(curNode));
 			foundNode = curNode;
 			return;
 		}
 
 		recurseAdd(curNode->getRightChild(),insertNode,myEclipse,hasRotated);
 		//After right recursion return, update balanceFactor based on right branch insertion
-		if (!hasRotated && !(foundNode->hasTwoChildren()))
+		if (!hasRotated)
 		{
-			curNode->setBalanceFactor(curNode->getBalanceFactor() - 1); //Only update if lower branch hasn't rotated
+			curNode->setBalanceFactor(computeBalanceFactor(curNode)); //Only update if lower branch hasn't rotated
 		}
 
 		if (abs(curNode->getBalanceFactor()) == 2) //check for re-balancing
@@ -104,16 +104,16 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 		{
 			curNode->setLeftChild(insertNode);
 			insertNode->setParent(curNode);
-			curNode->setBalanceFactor(curNode->getBalanceFactor() + 1);
+			curNode->setBalanceFactor(computeBalanceFactor(curNode));
 			foundNode = curNode;
 			return;
 		}
 
 		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse,hasRotated);
 		//After left recursion return, update balanceFactor based on left branch insertion
-		if (!hasRotated && !(foundNode->hasTwoChildren()))
+		if (!hasRotated)
 		{
-			curNode->setBalanceFactor(curNode->getBalanceFactor() + 1); //Only update if lower branch hasn't rotated
+			curNode->setBalanceFactor(computeBalanceFactor(curNode)); //Only update if lower branch hasn't rotated
 		}
 
 		if (abs(curNode->getBalanceFactor()) == 2)
@@ -239,6 +239,7 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 				}
 			}
 			//Parent to delNode-child relations have been formed, now delete delNode
+			balanceTree(delNode);
 			delNode = 0;
 		}
 	}
@@ -312,6 +313,61 @@ void AvlTree::find(TreeNode* curNode, int key, bool &forRemoval)
 		this->setFoundNode(new TreeNode());
 	}
 	return;
+}
+
+int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a new bF
+{
+	int leftDepth = -1;
+	int rightDepth = -1;
+	computeBalanceFactor(myNode,leftDepth,rightDepth);
+	return (leftDepth - rightDepth);
+}
+
+void AvlTree::computeBalanceFactor(TreeNode* myNode, int &leftDepth, int &rightDepth)
+{
+	//first compute left depth. If either child are valid, keep going
+	if (leftDepth == -1) //only perform this once
+	{
+		leftDepth = 0;
+		while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0)
+		{
+			if (myNode->getLeftChild() != 0)
+			{
+				computeBalanceFactor(myNode->getLeftChild(),leftDepth,rightDepth);
+				leftDepth++;
+				return;
+			}
+
+			if (leftDepth != 0 && myNode->getRightChild() != 0)
+			{
+				computeBalanceFactor(myNode->getRightChild(),leftDepth,rightDepth);
+				leftDepth++;
+				return;
+			}
+		}
+	}
+
+	//then compute right depth. If either child are valid, keep going
+	if (rightDepth == -1) //only perform this once
+	{
+		rightDepth = 0;
+		while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0)
+		{
+			if (myNode->getRightChild() != 0)
+			{
+				computeBalanceFactor(myNode->getRightChild(),leftDepth,rightDepth);
+				rightDepth++;
+				return;
+			}
+
+			if (rightDepth != 0 && myNode->getLeftChild() != 0)
+			{
+				computeBalanceFactor(myNode->getLeftChild(),leftDepth,rightDepth);
+				rightDepth++;
+				return;
+			}
+		}
+	}
 }
 
 void AvlTree::printPreOrder()
@@ -643,10 +699,10 @@ int main() {
 	Eclipse* myEclipse12 = new Eclipse(myString12);
 
 	AvlTree* myTree = new AvlTree();
-	myTree->addItem(myEclipse8);
-	myTree->addItem(myEclipse3);
-	myTree->addItem(myEclipse10);
+	myTree->addItem(myEclipse1);
 	myTree->addItem(myEclipse2);
+	myTree->addItem(myEclipse3);
+	/*myTree->addItem(myEclipse2);
 	myTree->addItem(myEclipse6);
 	myTree->addItem(myEclipse9);
 	myTree->addItem(myEclipse12);
@@ -654,7 +710,7 @@ int main() {
 	myTree->addItem(myEclipse4);
 	myTree->addItem(myEclipse7);
 	myTree->addItem(myEclipse11);
-	myTree->addItem(myEclipse5);
+	myTree->addItem(myEclipse5);*/
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();
