@@ -41,7 +41,7 @@ private:
 	void copyToArray(ResizeableArray<Eclipse>& myEclipses, TreeNode* firstNode);
 	void find(TreeNode* curNode, int key);
 	int computeBalanceFactor(TreeNode* myNode);
-	void computeBalanceFactor(TreeNode* myNode, int &leftDepth, int &rightDepth); //resolve infinite loop here
+	void computeBalanceFactor(TreeNode* myNode, int &branchDepth, bool isLeftBranch); //resolve infinite loop here
 	TreeNode* rootNode;
 	TreeNode* tempNode;
 };

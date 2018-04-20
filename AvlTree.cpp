@@ -38,7 +38,7 @@ void AvlTree::addItem(Eclipse* myEclipse)
 
 			recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
 			//After right recursion return, update tree's bF's and rotations
-			updateTree(tempNode);
+			updateTree(insertNode);
 		}
 		else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 		{
@@ -51,7 +51,7 @@ void AvlTree::addItem(Eclipse* myEclipse)
 
 			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
 			//After left recursion return, update tree's bF's and rotations
-			updateTree(tempNode);
+			updateTree(insertNode);
 		}
 	}
 }
@@ -64,7 +64,6 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 		{
 			curNode->setRightChild(insertNode); //when assigning insertNode, need to assign parent relation
 			insertNode->setParent(curNode);
-			tempNode = curNode;
 			return;
 		}
 		recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
@@ -77,7 +76,6 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 		{
 			curNode->setLeftChild(insertNode);
 			insertNode->setParent(curNode);
-			tempNode = curNode;
 			return;
 		}
 		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
@@ -103,12 +101,12 @@ void AvlTree::setTempNode(TreeNode* myFoundNode)
 
 void AvlTree::removeItem(Eclipse* myEclipse)
 {
-	//TODO make 3 methods to cover the 3 removal cases: leaf node, node with 1 child, node with 2 children
+	//TODO 3 removal cases: leaf node, node with 1 child, node with 2 children
 	
 	TreeNode* delNode = findNode(myEclipse->getID());
 	if (delNode->getEclipse()->getIsBlank()) //If an invalid node, cerr and return
 	{
-		cerr << "This item does not exist!" << endl;
+		cerr << "Item with key " << myEclipse->getID() << " does not exist!" << endl;
 		return;
 	}
 	
@@ -118,6 +116,7 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 		if (delNode->getParent() == 0) //delnode is the root
 		{
 			delNode = 0;
+			rootNode = 0;
 		}
 		else //delnode has a parent
 		{
@@ -147,8 +146,43 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 			succNode = succNode->getLeftChild();
 		}
 		
-		delNode->setEclipse(succNode->getEclipse()); //assign delNode as Successor
-		removeItem(succNode->getEclipse()); //recurse to delete successor Node
+		delNode->setKey(succNode->getKey());
+		delNode->setEclipse(succNode->getEclipse()); //assign delNode with successor data
+
+		bool isLeftChild = (succNode->getKey() == succNode->getParent()->getLeftChild()->getKey());
+		//If succNode is a leaf node, delete leaf node and update tree
+		if (succNode->getRightChild() == 0)
+		{
+			if (isLeftChild)
+			{
+				succNode->getParent()->setLeftChild(0);
+			}
+			else
+			{
+				succNode->getParent()->setRightChild(0);
+			}
+			tempNode = succNode->getParent();
+			succNode = 0;
+			updateTree(tempNode);
+		}
+		else //otherwise delete succNode as a has-right-child-and-parent case
+		{
+			TreeNode* parent = succNode->getParent();
+
+			if (isLeftChild)
+			{
+				parent->setLeftChild(succNode->getRightChild());
+				parent->getLeftChild()->setParent(parent);
+			}
+			else
+			{
+				parent->setRightChild(succNode->getRightChild());
+				parent->getRightChild()->setParent(parent);
+				//Parent to succNode-child relations have been formed, now delete succNode
+				succNode = 0;
+				updateTree(parent);
+			}
+		}
 		
 	}
 	
@@ -163,11 +197,13 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 			{
 				rootNode = delNode->getLeftChild();
 				delNode = 0;
+				updateTree(rootNode);
 			}
 			else
 			{
 				rootNode = delNode->getRightChild();
 				delNode = 0;
+				updateTree(rootNode);
 			}
 		}
 		else //delNode has a parent
@@ -254,55 +290,56 @@ void AvlTree::find(TreeNode* curNode, int key)
 
 int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a new balanceFactor
 {
-	int leftDepth = -1;
-	int rightDepth = -1;
-	computeBalanceFactor(myNode,leftDepth,rightDepth);
+	int leftDepth = 0;
+	int rightDepth = 0;
+	computeBalanceFactor(myNode,leftDepth,true);
+	computeBalanceFactor(myNode,rightDepth,false);
 	return (leftDepth - rightDepth);
 }
 
-void AvlTree::computeBalanceFactor(TreeNode* myNode, int &leftDepth, int &rightDepth) //TODO solve infinite loop
+void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth, bool isLeftBranch)
 {
 	//first compute left depth. If either child are valid, keep going
-	if (leftDepth == -1) //only perform this once
+	if (isLeftBranch)
 	{
-		leftDepth = 0;
-		while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0)
+		while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0) //keep recursing as long as there is a valid child
 		{
 			if (myNode->getLeftChild() != 0)
 			{
-				computeBalanceFactor(myNode->getLeftChild(),leftDepth,rightDepth);
-				leftDepth++;
+				branchDepth++;
+				computeBalanceFactor(myNode->getLeftChild(),branchDepth,isLeftBranch);
 				return;
 			}
 
-			if (leftDepth != 0 && myNode->getRightChild() != 0)
+			if (branchDepth != 0 && myNode->getRightChild() != 0)
 			{
-				computeBalanceFactor(myNode->getRightChild(),leftDepth,rightDepth);
-				leftDepth++;
+				branchDepth++;
+				computeBalanceFactor(myNode->getRightChild(),branchDepth,isLeftBranch);
 				return;
 			}
+			return;
 		}
 	}
 
 	//then compute right depth. If either child are valid, keep going
-	if (rightDepth == -1) //only perform this once
+	else
 	{
-		rightDepth = 0;
 		while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0)
 		{
 			if (myNode->getRightChild() != 0)
 			{
-				computeBalanceFactor(myNode->getRightChild(),leftDepth,rightDepth);
-				rightDepth++;
+				branchDepth++;
+				computeBalanceFactor(myNode->getRightChild(),branchDepth,isLeftBranch);
 				return;
 			}
 
-			if (rightDepth != 0 && myNode->getLeftChild() != 0)
+			if (branchDepth != 0 && myNode->getLeftChild() != 0)
 			{
-				computeBalanceFactor(myNode->getLeftChild(),leftDepth,rightDepth);
-				rightDepth++;
+				branchDepth++;
+				computeBalanceFactor(myNode->getLeftChild(),branchDepth,isLeftBranch);
 				return;
 			}
+			return;
 		}
 	}
 }
@@ -314,16 +351,19 @@ void AvlTree::printPreOrder()
 
 void AvlTree::printPreOrder(TreeNode* curNode)
 {
-	cout << *(curNode->getEclipse());
-
-	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	if (rootNode != 0)
 	{
-		printPreOrder(curNode->getLeftChild());
-	}
+		cout << *(curNode->getEclipse());
 
-	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
-	{
-		printPreOrder(curNode->getRightChild());
+		if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+		{
+			printPreOrder(curNode->getLeftChild());
+		}
+
+		if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+		{
+			printPreOrder(curNode->getRightChild());
+		}
 	}
 }
 
@@ -334,16 +374,19 @@ void AvlTree::printInOrder()
 
 void AvlTree::printInOrder(TreeNode* curNode)
 {
-	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	if (rootNode != 0)
 	{
-		printInOrder(curNode->getLeftChild());
-	}
+		if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+		{
+			printInOrder(curNode->getLeftChild());
+		}
 
-	cout << *(curNode->getEclipse());
+		cout << *(curNode->getEclipse());
 
-	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
-	{
-		printInOrder(curNode->getRightChild());
+		if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+		{
+			printInOrder(curNode->getRightChild());
+		}
 	}
 }
 
@@ -354,17 +397,20 @@ void AvlTree::printPostOrder()
 
 void AvlTree::printPostOrder(TreeNode* curNode)
 {
-	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	if (rootNode != 0)
 	{
-		printPostOrder(curNode->getLeftChild());
-	}
+		if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+		{
+			printPostOrder(curNode->getLeftChild());
+		}
 
-	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
-	{
-		printPostOrder(curNode->getRightChild());
-	}
+		if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+		{
+			printPostOrder(curNode->getRightChild());
+		}
 
-	cout << *(curNode->getEclipse());
+		cout << *(curNode->getEclipse());
+	}
 }
 
 void AvlTree::copyToArray(ResizeableArray<Eclipse> &myEclipses)
@@ -389,7 +435,7 @@ void AvlTree::copyToArray(ResizeableArray<Eclipse> &myEclipses, TreeNode* firstN
 
 void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel up the parents to check for rotation cases
 {
-	TreeNode* curNode = insertedNode->getParent(); //we start at the parent of the node that was added/removed
+	TreeNode* curNode = insertedNode; //we start at the node that was added/removed
 	curNode->setBalanceFactor(computeBalanceFactor(curNode));
 	bool hasLeftChild = (insertedNode->getLeftChild() != 0);
 
@@ -442,17 +488,17 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 
 void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 {
-	bool isRoot = (nodeA->getParent() == 0);
+	bool isRoot = (nodeA->getParent() == 0); //edge case is that nodeA is the root
 	TreeNode* parentOfA;
-	bool isLeftDecent;
+	bool isLeftChild; //check whether nodeA is a left child
 	if (!isRoot)
 	{
 		parentOfA = nodeA->getParent();
 		if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
 		{
-			isLeftDecent = true;
+			isLeftChild = true;
 		}
-		else (isLeftDecent = false);
+		else (isLeftChild = false);
 	}
 	TreeNode* nodeB = nodeA->getLeftChild();
 	TreeNode* rcOfB = nodeB->getRightChild();
@@ -460,32 +506,50 @@ void AvlTree::leftHeavyRotate(TreeNode* nodeA)
 	nodeB->setRightChild(nodeA);
 	nodeA->setParent(nodeB);
 	nodeA->setLeftChild(rcOfB);
-	rcOfB->setParent(nodeA);
-	nodeB->setParent(parentOfA);
-	if (isLeftDecent)
+	if (rcOfB != 0) //only assign if it exists
 	{
-		parentOfA->setLeftChild(nodeB);
+		rcOfB->setParent(nodeA);
 	}
-	else
+
+	if (!isRoot)
 	{
-		parentOfA->setRightChild(nodeB);
+		nodeB->setParent(parentOfA);
+
+		if (isLeftChild)
+		{
+			parentOfA->setLeftChild(nodeB);
+		}
+		else
+		{
+			parentOfA->setRightChild(nodeB);
+		}
+	}
+	else //otherwise, assign nodeB's parent as 0, and nodeB is now the root
+	{
+		nodeB->setParent(0);
+		rootNode = nodeB;
 	}
 
 	nodeA->setBalanceFactor(0);
 	nodeB->setBalanceFactor(0);
 }
 
-void AvlTree::leftInnerRotate(TreeNode* nodeA) //TODO
+void AvlTree::leftInnerRotate(TreeNode* nodeA)
 {
-	TreeNode* parentOfA = nodeA->getParent();
-	bool isLeftDecent;
-	if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
+	bool isRoot = (nodeA->getParent() == 0); //edge case is that nodeA is the root
+	TreeNode* parentOfA;
+	bool isLeftChild; //check whether nodeA is a left child
+	if (!isRoot)
 	{
-		isLeftDecent = true;
+		parentOfA = nodeA->getParent();
+		if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
+		{
+			isLeftChild = true;
+		}
+		else (isLeftChild = false);
 	}
-	else (isLeftDecent = false);
 	TreeNode* nodeB = nodeA->getLeftChild();
-	TreeNode* nodeC = nodeB->getRightChild();
+	TreeNode* nodeC = nodeB->getRightChild(); //after rotation, check if nodeC is the new root
 	TreeNode* lcOfC = nodeC->getLeftChild();
 	TreeNode* rcOfC = nodeC->getRightChild();
 
@@ -494,17 +558,33 @@ void AvlTree::leftInnerRotate(TreeNode* nodeA) //TODO
 	nodeC->setRightChild(nodeA);
 	nodeA->setParent(nodeC);
 	nodeB->setRightChild(lcOfC);
-	lcOfC->setParent(nodeB);
-	nodeA->setLeftChild(rcOfC);
-	rcOfC->setParent(nodeA);
-	nodeC->setParent(parentOfA);
-	if (isLeftDecent)
+	if (lcOfC != 0) //only assign if exists
 	{
-		parentOfA->setLeftChild(nodeC);
+		lcOfC->setParent(nodeB);
 	}
-	else
+	nodeA->setLeftChild(rcOfC);
+	if (rcOfC != 0) //only assign if exists
 	{
-		parentOfA->setRightChild(nodeC);
+		rcOfC->setParent(nodeA);
+	}
+
+	if (!isRoot)
+	{
+		nodeC->setParent(parentOfA);
+
+		if (isLeftChild)
+		{
+			parentOfA->setLeftChild(nodeC);
+		}
+		else
+		{
+			parentOfA->setRightChild(nodeC);
+		}
+	}
+	else //nodeC is the new root
+	{
+		nodeC->setParent(0);
+		rootNode = nodeC;
 	}
 
 	nodeA->setBalanceFactor(0);
@@ -516,15 +596,15 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA) //In this case, only nodeA, node
 {
 	bool isRoot = (nodeA->getParent() == 0); //Edge case is that nodeA is the tree's root
 	TreeNode* parentOfA;
-	bool isRightDescent; //Because we don't know if nodeA is a left or right child, do a check at runtime
+	bool isRightChild; //Because we don't know if nodeA is a left or right child, do a check at runtime
 	if (!isRoot)
 	{
 		parentOfA = nodeA->getParent();
 		if (parentOfA->getRightChild()->getKey() == nodeA->getKey())
 		{
-			isRightDescent = true;
+			isRightChild = true;
 		}
-		else (isRightDescent = false);
+		else (isRightChild = false);
 	}
 	TreeNode* nodeB = nodeA->getRightChild();
 	TreeNode* lcOfB = nodeB->getLeftChild();
@@ -536,10 +616,12 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA) //In this case, only nodeA, node
 	{
 		lcOfB->setParent(nodeA); //Only point B's left child to A if child exists
 	}
+
 	if (!isRoot) //If nodeA is not the root, assign nodeB's parent and nodeA's parent's child
 	{
 		nodeB->setParent(parentOfA);
-		if (isRightDescent)
+
+		if (isRightChild)
 		{
 			parentOfA->setRightChild(nodeB);
 		}
@@ -558,15 +640,20 @@ void AvlTree::rightHeavyRotate(TreeNode* nodeA) //In this case, only nodeA, node
 	nodeB->setBalanceFactor(0);
 }
 
-void AvlTree::rightInnerRotate(TreeNode* nodeA) //TODO
+void AvlTree::rightInnerRotate(TreeNode* nodeA)
 {
-	TreeNode* parentOfA = nodeA->getParent();
-	bool isRightDecent;
-	if (parentOfA->getRightChild()->getKey() == nodeA->getKey())
+	bool isRoot = (nodeA->getParent() == 0); //edge case is that nodeA is the root
+	TreeNode* parentOfA;
+	bool isRightChild; //check whether nodeA is a left child
+	if (!isRoot)
 	{
-		isRightDecent = true;
+		parentOfA = nodeA->getParent();
+		if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
+		{
+			isRightChild = true;
+		}
+		else (isRightChild = false);
 	}
-	else (isRightDecent = false);
 	TreeNode* nodeB = nodeA->getRightChild();
 	TreeNode* nodeC = nodeB->getLeftChild();
 	TreeNode* lcOfC = nodeC->getLeftChild();
@@ -577,17 +664,33 @@ void AvlTree::rightInnerRotate(TreeNode* nodeA) //TODO
 	nodeC->setRightChild(nodeB);
 	nodeB->setParent(nodeC);
 	nodeA->setRightChild(lcOfC);
-	lcOfC->setParent(nodeA);
-	nodeB->setLeftChild(rcOfC);
-	rcOfC->setParent(nodeB);
-	nodeC->setParent(parentOfA);
-	if (isRightDecent)
+	if (lcOfC != 0) //if exists, assign
 	{
-		parentOfA->setRightChild(nodeC);
+		lcOfC->setParent(nodeA);
 	}
-	else
+	nodeB->setLeftChild(rcOfC);
+	if (rcOfC != 0) //only assign if exists
 	{
-		parentOfA->setLeftChild(nodeC);
+		rcOfC->setParent(nodeB);
+	}
+
+	if (!isRoot)
+	{
+		nodeC->setParent(parentOfA);
+
+		if (isRightChild)
+		{
+			parentOfA->setRightChild(nodeC);
+		}
+		else
+		{
+			parentOfA->setLeftChild(nodeC);
+		}
+	}
+	else //nodeC is the new root
+	{
+		nodeC->setParent(0);
+		rootNode = nodeC;
 	}
 
 	nodeA->setBalanceFactor(0);
@@ -638,17 +741,17 @@ int main() {
 
 	AvlTree* myTree = new AvlTree();
 	myTree->addItem(myEclipse1);
-	myTree->addItem(myEclipse2);
 	myTree->addItem(myEclipse3);
-	/*myTree->addItem(myEclipse2);
-	myTree->addItem(myEclipse6);
-	myTree->addItem(myEclipse9);
-	myTree->addItem(myEclipse12);
-	myTree->addItem(myEclipse1);
-	myTree->addItem(myEclipse4);
+	myTree->addItem(myEclipse5);
 	myTree->addItem(myEclipse7);
+	myTree->addItem(myEclipse9);
 	myTree->addItem(myEclipse11);
-	myTree->addItem(myEclipse5);*/
+	myTree->addItem(myEclipse12);
+	myTree->addItem(myEclipse2);
+	myTree->addItem(myEclipse4);
+	myTree->addItem(myEclipse10);
+	myTree->addItem(myEclipse6);
+	myTree->addItem(myEclipse8);
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();
@@ -657,7 +760,16 @@ int main() {
 	cout << "Printing Post-Order..." << endl;
 	myTree->printPostOrder();*/
 
+	cout << "Deleting nodes..." << endl;
+	myTree->removeItem(myEclipse7);
+	myTree->removeItem(myEclipse3);
+	myTree->removeItem(myEclipse5);
 	myTree->removeItem(myEclipse1);
+	myTree->removeItem(myEclipse11);
+	myTree->removeItem(myEclipse9);
+
+	cout << "Re-printing Pre-Order..." << endl;
+	myTree->printPreOrder();
 
 	cout << "Done.";
 

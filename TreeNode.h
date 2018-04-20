@@ -29,6 +29,7 @@ public:
 	void setEclipse(Eclipse* myEclipse);
 	Eclipse* getEclipse();
 	int getKey();
+	void setKey(int myKey);
 	void setBalanceFactor(int myBalanceFactor);
 	int getBalanceFactor();
 	TreeNode* operator=(const TreeNode& myNode);
@@ -146,6 +147,11 @@ void TreeNode::setBalanceFactor(int myBalanceFactor)
 int TreeNode::getBalanceFactor()
 {
 	return balanceFactor;
+}
+
+void TreeNode::setKey(int myKey)
+{
+	key = myKey;
 }
 
 TreeNode* TreeNode::operator=(const TreeNode& myNode)
