@@ -101,7 +101,7 @@ void AvlTree::setTempNode(TreeNode* myFoundNode)
 
 void AvlTree::removeItem(Eclipse* myEclipse)
 {
-	//TODO 3 removal cases: leaf node, node with 1 child, node with 2 children
+	//3 removal cases: leaf node, node with 1 child, node with 2 children
 	
 	TreeNode* delNode = findNode(myEclipse->getID());
 	if (delNode->getEclipse()->getIsBlank()) //If an invalid node, cerr and return
@@ -120,7 +120,13 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 		}
 		else //delnode has a parent
 		{
-			if (delNode->getKey() == delNode->getParent()->getLeftChild()->getKey()) //delNode is a left child
+			bool isLeftChild = false;
+			if (delNode->getParent()->getLeftChild() != 0) //only compare with left child if it exists
+			{
+				isLeftChild = delNode->getKey() == delNode->getParent()->getLeftChild()->getKey();
+			}
+
+			if (isLeftChild) //delNode is a left child
 			{
 				delNode->getParent()->setLeftChild(0);
 				tempNode = delNode->getParent();
@@ -208,7 +214,11 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 		}
 		else //delNode has a parent
 		{
-			bool isLeftChild = (delNode->getKey() == delNode->getParent()->getLeftChild()->getKey());
+			bool isLeftChild = false;
+			if (delNode->getParent()->getLeftChild() != 0) //only compare with left child if it exists
+			{
+				isLeftChild = delNode->getKey() == delNode->getParent()->getLeftChild()->getKey();
+			}
 			TreeNode* parent = delNode->getParent();
 
 			if (isLeftChild) //if delNode is a left child...
@@ -444,11 +454,15 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 	{
 		if (hasLeftChild)
 		{
-			updateTree(insertedNode->getRightChild());
+			tempNode = insertedNode->getLeftChild();
+			updateTree(tempNode);
+			return;
 		}
 		else //otherwise, insertedNode has a right child
 		{
-			updateTree(insertedNode->getLeftChild());
+			tempNode = insertedNode->getRightChild();
+			updateTree(tempNode);
+			return;
 		}
 	}	//above will restart at the node that will catch the rotation
 
@@ -761,12 +775,13 @@ int main() {
 	myTree->printPostOrder();*/
 
 	cout << "Deleting nodes..." << endl;
-	myTree->removeItem(myEclipse7);
-	myTree->removeItem(myEclipse3);
-	myTree->removeItem(myEclipse5);
-	myTree->removeItem(myEclipse1);
-	myTree->removeItem(myEclipse11);
-	myTree->removeItem(myEclipse9);
+	myTree->removeItem(myEclipse2);
+	myTree->removeItem(myEclipse4);
+	myTree->removeItem(myEclipse6);
+	myTree->removeItem(myEclipse12);
+	myTree->removeItem(myEclipse10);
+	myTree->removeItem(myEclipse8);
+	myTree->removeItem(myEclipse10);
 
 	cout << "Re-printing Pre-Order..." << endl;
 	myTree->printPreOrder();
