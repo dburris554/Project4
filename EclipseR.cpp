@@ -11,7 +11,7 @@
 
 using namespace std;
 
-/*int main()
+int main()
 {
 	string* header[10]; //holds header data for output
 	string tmp = ""; //string placeholder often used in user input
@@ -22,7 +22,8 @@ using namespace std;
 	int totalValidLinesRead = 0; //total valid lines in input file
 	int sortedCol = -1; //column previously sorted
 	ResizeableArray<Eclipse> myEclipses; //Data structure used for searching and sorting
-	LinkedList* myList = new LinkedList(); //Data structure holding the Eclipse objects imported
+	AvlTree* myTree = new AvlTree(); //Data structure used to store Eclipse data and for Merging/Purging
+	LinkedList* myList = new LinkedList(); //Data structure sent into HashMap to initialize the map
 	HashMap* myMap; //HashMap for Eclipse ID constant search time, declare here and initialize later
 	Eclipse* myEclipse = 0; //Eclipse sent into processLine to store Eclipses into LinkedList
 	ifstream input; // Input file stream
@@ -60,18 +61,22 @@ using namespace std;
 		{
 			//Read the rest of the file
 			getline(input,tmp);
-			if (processLine(tmp,lineNum++,myList,myEclipse,numDuplicates,true)) //returns goodData boolean
+			if (processLine(tmp,lineNum++,myTree,myEclipse,numDuplicates,true)) //returns goodData boolean
 			{
 				totalValidLinesRead++;
 			}
 			totalLinesRead++;
-			delete myEclipse; //This line is causing problems
+			delete myEclipse;
 		}
 		totalValidLinesRead -= numDuplicates; //subtract all of the duplicate entries from valid lines read
 		input.close(); //input file is done being read
 
 		//Now make the ResizeableArray
-		myList->copyToArray(myEclipses);
+		myTree->copyToArray(myEclipses); //TODO may break
+
+		//Now make the LinkedList
+		myList = new LinkedList(myEclipses);
+
 		//Now make the HashMap
 		myMap = new HashMap(*myList,5); //2nd arg is bucket depth
 
@@ -83,9 +88,10 @@ using namespace std;
 		do
 		{
 			cout << "'O' to Output" << endl << "'S' to Sort" << endl << "'F' to Find"
-					<< endl << "'M' to Merge" << endl << "'P' to Purge" << endl
-					<< "'C' to print data" << endl << "'H' for Hash display"
-					<< endl << "'L' for Linked display" << endl << "'Q' to Quit" << endl;
+				<< endl << "'M' to Merge" << endl << "'P' to Purge" << endl << "'R' for Pre-Order print"
+				<< endl << "'C' for In-Order print" << endl << "'T' for Post-Order print"
+				<< endl << "'H' for Hash display" << endl << "'L' for Linked display" << endl << "'Q' to Quit"
+				<< endl;
 
 			getline(cin,userChoice); //get user selection, case doesn't matter
 
@@ -103,24 +109,44 @@ using namespace std;
 			}
 			else if (userChoice == "M" || userChoice == "m") //merges files into dataset
 			{
-				option_M(tmp,input,iFilename,myList,myEclipse,lineNum,numDuplicates,totalLinesRead,totalValidLinesRead);
-				//Now remake the ResizeableArray
-				myList->copyToArray(myEclipses);
+				option_M(tmp,input,iFilename,myTree,myEclipse,lineNum,numDuplicates,totalLinesRead,totalValidLinesRead);
+
+				//Now make the ResizeableArray
+				myTree->copyToArray(myEclipses); //TODO may break
+
+				//Now make the LinkedList
+				delete myList;
+				myList = new LinkedList(myEclipses);
+
 				//Now remake the HashMap
 				myMap = new HashMap(*myList,5); //2nd arg is bucket depth
 			}
 			else if (userChoice == "P" || userChoice == "p") //purges files from dataset
 			{
-				option_P(tmp,input,iFilename,myList,myEclipse,lineNum,
+				option_P(tmp,input,iFilename,myTree,myEclipse,lineNum,
 						totalLinesRead,totalValidLinesRead);
-				//Now remake the ResizeableArray
-				myList->copyToArray(myEclipses);
+
+				//Now make the ResizeableArray
+				myTree->copyToArray(myEclipses); //TODO may break
+
+				//Now make the LinkedList
+				delete myList;
+				myList = new LinkedList(myEclipses);
+
 				//Now remake the HashMap
 				myMap = new HashMap(*myList,5); //2nd arg is bucket depth
 			}
-			else if (userChoice == "C" || userChoice == "c") //prints contents of the LinkedList to console
+			else if (userChoice == "R" || userChoice == "r") //prints AVLtree contents pre-ordered to console
 			{
-				option_C(myList);
+				option_R(myTree);
+			}
+			else if (userChoice == "C" || userChoice == "c") //prints AVLtree contents in-order to console
+			{
+				option_C(myTree);
+			}
+			else if (userChoice == "T" || userChoice == "t") //prints AVLtree contents post-order to console
+			{
+				option_T(myTree);
 			}
 			else if (userChoice == "H" || userChoice == "h") //prints the HashMap by bucket order
 			{
@@ -142,9 +168,9 @@ using namespace std;
 		} while(userChoice != "Q" && userChoice != "q");
 	}
 	return 0;
-}*/
+}
 /////////////////////////// Method Implementations ////////////////////////////
-bool processLine(string tmp, int lineNum, LinkedList* myList, Eclipse* myEclipse, int& numDuplicates, bool toAdd)
+bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, int& numDuplicates, bool toAdd)
 {
 	if (tmp == "") //If the line of the file is empty, return 'badData'
 	{
@@ -249,11 +275,27 @@ bool processLine(string tmp, int lineNum, LinkedList* myList, Eclipse* myEclipse
 
 		if (toAdd == true) //Add to database
 		{
-			numDuplicates += myList->mergeAdd(myEclipse);
+			Eclipse* tempEclipse = myTree->findEclipse(myEclipse->getID());
+			bool isDuplicate = false;
+
+			if (!tempEclipse->getIsBlank()) //only compare if returns a valid Eclipse
+			{
+				isDuplicate = (myEclipse->getID() == (myTree->findEclipse(myEclipse->getID()))->getID()); //If eclipse is found, already exists in tree
+			}
+			if (isDuplicate) //if a duplicate, increment counter, change that node's eclipse value
+			{
+				numDuplicates++;
+				myTree->setTempNode(myTree->findNode(myEclipse->getID()));
+				myTree->getTempNode()->setEclipse(myEclipse);
+			}
+			else //otherwise, add as a new entry
+			{
+				myTree->addItem(myEclipse);
+			}
 		}
 		else if (toAdd == false) //Remove from database
 		{
-			myList->purgeRemove(myEclipse);
+			myTree->removeItem(myEclipse);
 		}
 	}
 	return goodData;
@@ -549,7 +591,7 @@ void option_F(ResizeableArray<Eclipse>& myEclipses, int sortedCol, string* heade
 	}
 }
 
-void option_M(string tmp,ifstream& input,char iFilename[],LinkedList* myList,Eclipse* myEclipse,int lineNum,int& numDuplicates,
+void option_M(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,int& numDuplicates,
 		int& totalLinesRead, int& totalValidLinesRead)
 {
 	//Prompt for a data file, verify the file, and attempt to merge the eclipses into existing LinkedList
@@ -579,7 +621,7 @@ void option_M(string tmp,ifstream& input,char iFilename[],LinkedList* myList,Ecl
 	{
 		//Read the rest of the file
 		getline(input,tmp);
-		if (processLine(tmp,lineNum++,myList,myEclipse,numDuplicates,true)) //returns goodData boolean
+		if (processLine(tmp,lineNum++,myTree,myEclipse,numDuplicates,true)) //returns goodData boolean
 		{
 			totalValidLinesRead++;
 		}
@@ -589,7 +631,7 @@ void option_M(string tmp,ifstream& input,char iFilename[],LinkedList* myList,Ecl
 	input.close(); //input file is done being read
 }
 
-void option_P(string tmp,ifstream& input,char iFilename[],LinkedList* myList,Eclipse* myEclipse,int lineNum,
+void option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,
 		int& totalLinesRead, int& totalValidLinesRead)
 {
 	//Prompt for a data file, verify the file, and attempt to purge the eclipses from LinkedList. If the
@@ -599,8 +641,8 @@ void option_P(string tmp,ifstream& input,char iFilename[],LinkedList* myList,Ecl
 	int numDuplicates = 0; //will be incremented if a duplicate is found
 	lineNum = 1; // Reset line number before processing the input file
 
-	//If there is no data in the LinkedList, return
-	if (myList->getLength() == 0)
+	//If there is no data in the AvlTree, return
+	if (myTree->getRootNode() == 0)
 	{
 		cerr << "There is no data to purge!" << endl;
 		return;
@@ -627,7 +669,7 @@ void option_P(string tmp,ifstream& input,char iFilename[],LinkedList* myList,Ecl
 	{
 		//Read the rest of the file
 		getline(input,tmp);
-		if (processLine(tmp,lineNum++,myList,myEclipse,numDuplicates,false)) //returns goodData boolean
+		if (processLine(tmp,lineNum++,myTree,myEclipse,numDuplicates,false)) //returns goodData boolean
 		{
 			totalValidLinesRead++;
 		}
@@ -636,10 +678,21 @@ void option_P(string tmp,ifstream& input,char iFilename[],LinkedList* myList,Ecl
 	input.close(); //input file is done being read
 }
 
-void option_C(LinkedList* myList) //prints the contents of a given LinkedList
+void option_R(AvlTree* myTree) //prints AVLtree contents pre-order
 {
-	//Print out the LinkedList
-	myList->print();
+	myTree->printPreOrder();
+	cout << endl;
+}
+
+void option_C(AvlTree* myTree) //prints AVLtree contents in-order
+{
+	myTree->printInOrder();
+	cout << endl;
+}
+
+void option_T(AvlTree* myTree) //prints AVLtree contents post-order
+{
+	myTree->printPostOrder();
 	cout << endl;
 }
 

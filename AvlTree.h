@@ -5,11 +5,11 @@
  *      Author: david
  */
 
-#ifndef AVLTREE_H_
-#define AVLTREE_H_
-
 #include "TreeNode.h"
 #include "ResizeableArray.h"
+
+#ifndef AVLTREE_H_
+#define AVLTREE_H_
 
 class AvlTree {
 

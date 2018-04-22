@@ -106,7 +106,7 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 	TreeNode* delNode = findNode(myEclipse->getID());
 	if (delNode->getEclipse()->getIsBlank()) //If an invalid node, cerr and return
 	{
-		cerr << "Item with key " << myEclipse->getID() << " does not exist!" << endl;
+		cerr << "Eclipse catalog number " << myEclipse->getID() << " not found." << endl;
 		return;
 	}
 	
@@ -270,6 +270,11 @@ TreeNode* AvlTree::findNode(int key) //will return an invalid TreeNode if not fo
 
 void AvlTree::find(TreeNode* curNode, int key)
 {
+	if (rootNode == 0) //if tree is empty, don't look
+	{
+		tempNode = new TreeNode();
+		return;
+	}
 	if (curNode->getKey() < key) //first check to recurse right
 	{
 		if (curNode->getRightChild() != 0) //then make sure the right child exists
@@ -468,34 +473,36 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 
 	while (curNode->getParent() != 0) //continue updating and checking rotations until you reach the head node
 	{
-		curNode->getParent()->setBalanceFactor(computeBalanceFactor(curNode->getParent())); //update parent's bF before checking for rotation
+		//tempNode will be child and recurse up to the next parent
+		tempNode = curNode; //TODO
+		curNode = curNode->getParent();
+
+		curNode->setBalanceFactor(computeBalanceFactor(curNode)); //update parent's bF before checking for rotation
 
 		//Test for Left-Heavy rotation
-		if (curNode->getBalanceFactor() == 1 && curNode->getParent()->getBalanceFactor() == 2)
+		if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == 2)
 		{
-			leftHeavyRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
+			leftHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
 			return;
 		}
 		//Test for Left-Inner rotation
-		else if (curNode->getBalanceFactor() == -1 && curNode->getParent()->getBalanceFactor() == 2)
+		else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == 2)
 		{
-			leftInnerRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
+			leftInnerRotate(curNode); //rotate on sub-head node, return hasRotated
 			return;
 		}
 		//Test for Right-Heavy rotation
-		else if (curNode->getBalanceFactor() == -1 && curNode->getParent()->getBalanceFactor() == -2)
+		else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == -2)
 		{
-			rightHeavyRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
+			rightHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
 			return;
 		}
 		//Test for Right-Inner rotation
-		else if (curNode->getBalanceFactor() == 1 && curNode->getParent()->getBalanceFactor() == -2)
+		else if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == -2)
 		{
-			rightInnerRotate(curNode->getParent()); //rotate on sub-head node, return hasRotated
+			rightInnerRotate(curNode); //rotate on sub-head node, return hasRotated
 			return;
 		}
-		//recurse up to the next parent
-		curNode = curNode->getParent();
 	}
 	return;
 }
@@ -711,7 +718,7 @@ void AvlTree::rightInnerRotate(TreeNode* nodeA)
 	nodeB->setBalanceFactor(0);
 	nodeC->setBalanceFactor(0);
 }
-//----------------------------------------------------------------
+/*----------------------------------------------------------------
 int main() {
 	string* myString1 = new string[18];
 	string* myString2 = new string[18];
@@ -769,10 +776,10 @@ int main() {
 
 	cout << "Printing Pre-Order..." << endl;
 	myTree->printPreOrder();
-	/*cout << "Printing In-Order..." << endl;
+	cout << "Printing In-Order..." << endl;
 	myTree->printInOrder();
 	cout << "Printing Post-Order..." << endl;
-	myTree->printPostOrder();*/
+	myTree->printPostOrder();
 
 	cout << "Deleting nodes..." << endl;
 	myTree->removeItem(myEclipse2);
@@ -792,5 +799,5 @@ int main() {
 
 	return 0;
 }
-//----------------------------------------------------------------
+//----------------------------------------------------------------*/
 

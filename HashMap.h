@@ -79,6 +79,7 @@ HashMap::HashMap() //empty constructor sets everything to 0
 	numBuckets = 0;
 	bucketDepth = 0;
 	loadFactor = 0;
+	bucketArray = 0;
 }
 
 HashMap::~HashMap() {}

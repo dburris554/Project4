@@ -64,6 +64,7 @@ public:
 		}
 	};
 	LinkedList();
+	LinkedList(ResizeableArray<Eclipse> myEclipses);
 	LinkedList(LinkedList& myList);
 	virtual ~LinkedList();
 	LinkedList* operator=(const LinkedList& myList);
@@ -101,6 +102,20 @@ LinkedList::LinkedList() //LinkedList will always be created with blank pointers
 	numItems = 0;
 }
 
+LinkedList::LinkedList(ResizeableArray<Eclipse> myEclipses)
+{
+	head = 0;
+	tail = 0;
+	numItems = 0;
+	Eclipse myEclipse;
+
+	for (int i = 0; i < myEclipses.getNumItems(); i++)
+	{
+		myEclipse = myEclipses[i];
+		append(&myEclipse);
+	}
+}
+
 LinkedList::~LinkedList() {}
 
 LinkedList::LinkedList(LinkedList& myList)
@@ -118,7 +133,7 @@ LinkedList* LinkedList::operator=(const LinkedList& myList)
 	return this;
 }
 
-int LinkedList::mergeAdd(Eclipse* object) //adds incoming Eclipses in order by ID number
+int LinkedList::mergeAdd(Eclipse* object) //adds incoming Eclipses in order by ID number, returns 1 if duplicate
 {
 	int dupEntries = 0; //Set default number of duplicates to 0
 	Node* myNode = new Node(object); //myNode is the node to mergeAdd
@@ -307,7 +322,7 @@ void LinkedList::print()
 
 void LinkedList::sort()
 {
-	//TODO for practice perhaps
+	//for practice perhaps
 }
 
 bool LinkedList::isEmpty()

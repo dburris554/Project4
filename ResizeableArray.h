@@ -31,8 +31,8 @@ class ResizeableArray
 		void Double();
 		void Half();
 		TheType* myArray;
-		int myLength = 0;
-		int numItems = 0;
+		int myLength;
+		int numItems;
 };
 
 template<typename TheType>
