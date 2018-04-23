@@ -15,7 +15,7 @@ TreeNode::TreeNode() //used to make invalid node
 	eclipse = new Eclipse();
 	key = 0;
 	balanceFactor = 0;
-	height = 0; //TODO
+	//height = 0; //TODO
 }
 
 TreeNode::TreeNode(Eclipse* myEclipse) //used to initialize root node
@@ -26,7 +26,7 @@ TreeNode::TreeNode(Eclipse* myEclipse) //used to initialize root node
 	eclipse = myEclipse;
 	key = eclipse->getID();
 	balanceFactor = 0;
-	height = 0; //TODO
+	//height = 0; //TODO
 }
 
 TreeNode::TreeNode(TreeNode* parentNode, Eclipse* myEclipse) //used to initialize all other nodes
@@ -37,7 +37,7 @@ TreeNode::TreeNode(TreeNode* parentNode, Eclipse* myEclipse) //used to initializ
 	eclipse = myEclipse;
 	key = eclipse->getID();
 	balanceFactor = 0;
-	height = 0; //TODO
+	//height = 0; //TODO
 
 	if (key > parent->getKey()) //if this Node's key is greater than parent's, assign as right child
 	{
@@ -57,7 +57,7 @@ TreeNode::TreeNode(const TreeNode& oldNode)
 	this->leftChild = oldNode.leftChild;
 	this->parent = oldNode.parent;
 	this->rightChild = oldNode.rightChild;
-	this->height = oldNode.height; //TODO
+	//this->height = oldNode.height; //TODO
 }
 
 TreeNode::~TreeNode() {}
@@ -117,20 +117,20 @@ int TreeNode::getBalanceFactor()
 	return balanceFactor;
 }
 
-void TreeNode::incrementHeight() //TODO
+/*void TreeNode::incrementHeight() //TODO
 {
 	height++;
-}
+}*/
 
-void TreeNode::decrementHeight() //TODO
+/*void TreeNode::decrementHeight() //TODO
 {
 	height--;
-}
+}*/
 
-int TreeNode::getHeight() //TODO
+/*int TreeNode::getHeight() //TODO
 {
 	return height;
-}
+}*/
 
 void TreeNode::setKey(int myKey)
 {

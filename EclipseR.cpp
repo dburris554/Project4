@@ -75,7 +75,9 @@ int main()
 		myTree->copyToArray(myEclipses); //TODO may break
 
 		//Now make the LinkedList
-		myList = new LinkedList(myEclipses);
+		myEclipse = new Eclipse();
+		myList = new LinkedList(myEclipses,myEclipse);
+		delete myEclipse;
 
 		//Now make the HashMap
 		myMap = new HashMap(*myList,5); //2nd arg is bucket depth
@@ -116,7 +118,9 @@ int main()
 
 				//Now make the LinkedList
 				delete myList;
-				myList = new LinkedList(myEclipses);
+				myEclipse = new Eclipse();
+				myList = new LinkedList(myEclipses,myEclipse);
+				delete myEclipse;
 
 				//Now remake the HashMap
 				myMap = new HashMap(*myList,5); //2nd arg is bucket depth
@@ -131,7 +135,9 @@ int main()
 
 				//Now make the LinkedList
 				delete myList;
-				myList = new LinkedList(myEclipses);
+				myEclipse = new Eclipse();
+				myList = new LinkedList(myEclipses,myEclipse);
+				delete myEclipse;
 
 				//Now remake the HashMap
 				myMap = new HashMap(*myList,5); //2nd arg is bucket depth
@@ -273,31 +279,35 @@ bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, i
 	{
 		myEclipse = new Eclipse(linePointer);
 
-		if (toAdd == true) //Add to database
+		if (toAdd) //Add to database
 		{
 			Eclipse* tempEclipse = myTree->findEclipse(myEclipse->getID());
 			bool isDuplicate = false;
 
-			if (!tempEclipse->getIsBlank()) //only compare if returns a valid Eclipse
+			if (!(tempEclipse->getIsBlank())) //only compare if returns a valid Eclipse
 			{
-				isDuplicate = (myEclipse->getID() == (myTree->findEclipse(myEclipse->getID()))->getID()); //If eclipse is found, already exists in tree
+				isDuplicate = (myEclipse->getID() == tempEclipse->getID()); //If eclipse is found, already exists in tree
 			}
 			if (isDuplicate) //if a duplicate, increment counter, change that node's eclipse value
 			{
 				numDuplicates++;
-				myTree->setTempNode(myTree->findNode(myEclipse->getID()));
+				myTree->setTempNode(myTree->findNode(myEclipse->getID())); //TODO
+				myTree->getTempNode()->setKey(myEclipse->getID());
 				myTree->getTempNode()->setEclipse(myEclipse);
+				/*myTree->removeItem(tempEclipse);
+				myTree->addItem(myEclipse);*/ //TODO
 			}
 			else //otherwise, add as a new entry
 			{
 				myTree->addItem(myEclipse);
 			}
 		}
-		else if (toAdd == false) //Remove from database
+		else //Remove from database
 		{
 			myTree->removeItem(myEclipse);
 		}
 	}
+
 	return goodData;
 }
 
@@ -350,7 +360,7 @@ void option_O(string tmp, ofstream& output, char* oFilename, string* header[],
 	{
 		for (int i = 0; i < 10; i++) // Print the header
 		{
-			cout << *header[i];
+			cout << *(header[i]);
 		}
 
 		for (int i = 0; i < myEclipses.getNumItems(); ++i) // Print the body

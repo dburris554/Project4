@@ -64,7 +64,7 @@ public:
 		}
 	};
 	LinkedList();
-	LinkedList(ResizeableArray<Eclipse> myEclipses);
+	LinkedList(ResizeableArray<Eclipse>& myEclipses, Eclipse* tempEclipse);
 	LinkedList(LinkedList& myList);
 	virtual ~LinkedList();
 	LinkedList* operator=(const LinkedList& myList);
@@ -102,17 +102,16 @@ LinkedList::LinkedList() //LinkedList will always be created with blank pointers
 	numItems = 0;
 }
 
-LinkedList::LinkedList(ResizeableArray<Eclipse> myEclipses)
+LinkedList::LinkedList(ResizeableArray<Eclipse>& myEclipses, Eclipse* tempEclipse)
 {
 	head = 0;
 	tail = 0;
 	numItems = 0;
-	Eclipse myEclipse;
 
 	for (int i = 0; i < myEclipses.getNumItems(); i++)
 	{
-		myEclipse = myEclipses[i];
-		append(&myEclipse);
+		tempEclipse = new Eclipse(myEclipses[i]);
+		append(tempEclipse);
 	}
 }
 
