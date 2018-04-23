@@ -26,17 +26,23 @@ void AvlTree::addItem(Eclipse* myEclipse)
 	{
 		TreeNode* curNode = rootNode; //curNode will travel down the tree to find insertion location
 		TreeNode* insertNode = new TreeNode(myEclipse); //insertNode will travel down the tree so balanceTree can be called
+		//TODO bool isOnlyChild = true;
 		
 		if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
 		{
 			if (curNode->getRightChild() == 0) //insert here if right child is 0
 			{
 				curNode->setRightChild(new TreeNode(curNode,myEclipse)); //don't use insertNode here to avoid extra line
+				//TODO curNode->incrementHeight(); //we will use height to determine balance factors
 				curNode->setBalanceFactor(computeBalanceFactor(curNode)); //guaranteed no rotations will happen here
 				return;
 			}
 
 			recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
+			/*if (isOnlyChild)
+			{
+				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
+			}*///TODO
 			//After right recursion return, update tree's bF's and rotations
 			updateTree(insertNode);
 		}
@@ -45,11 +51,16 @@ void AvlTree::addItem(Eclipse* myEclipse)
 			if (curNode->getLeftChild() == 0) //insert here if left child is 0
 			{
 				curNode->setLeftChild(new TreeNode(curNode,myEclipse)); //Don't use insertNode until recurseAdd
+				//TODO curNode->incrementHeight(); //we will use height to determine balance factors
 				curNode->setBalanceFactor(computeBalanceFactor(curNode)); //guaranteed no rotation will happen here
 				return;
 			}
 
 			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
+			/*if (isOnlyChild)
+			{
+				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
+			}*///TODO
 			//After left recursion return, update tree's bF's and rotations
 			updateTree(insertNode);
 		}
@@ -62,24 +73,40 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 	{
 		if (curNode->getRightChild() == 0) //insert here if right child is 0
 		{
+			//TODO isOnlyChild = (curNode->getLeftChild() == 0); //test if inserted node will increment height
 			curNode->setRightChild(insertNode); //when assigning insertNode, need to assign parent relation
 			insertNode->setParent(curNode);
+			/*if (isOnlyChild)
+			{
+				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
+			}*///TODO
 			return;
 		}
 		recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
-
+		/*if (isOnlyChild)
+		{
+			curNode->incrementHeight(); //tree height won't increase if inserted as a second child
+		}*///TODO
 		return;
 	}
 	else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 	{
 		if (curNode->getLeftChild() == 0) //insert here if left child is 0
 		{
+			//TODO isOnlyChild = (curNode->getRightChild() == 0); //test if inserted node will increment height
 			curNode->setLeftChild(insertNode);
 			insertNode->setParent(curNode);
+			/*if (isOnlyChild)
+			{
+				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
+			}*///TODO
 			return;
 		}
 		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
-
+		/*if (isOnlyChild)
+		{
+			curNode->incrementHeight(); //tree height won't increase if inserted as a second child
+		}*///TODO
 		return;
 	}
 }
@@ -110,6 +137,16 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 		return;
 	}
 	
+	//TODO Since delNode is now valid, check if is an only child. If so, decrement tree height
+	/*if (delNode->getParent() != 0) //make sure not the root
+	{
+		if (!(delNode->getParent()->getLeftChild() != 0 && delNode->getParent()->getRightChild() != 0))
+			//if delNode's parent doesn't have two children, then delNode must be an only child
+		{
+			decrementTreeHeight(delNode);
+		}
+	}*/
+
 	//Leaf Node case
 	if (delNode->getLeftChild() == 0 && delNode->getRightChild() == 0) //delNode is a leaf node
 	{
@@ -303,13 +340,40 @@ void AvlTree::find(TreeNode* curNode, int key)
 	return;
 }
 
+void AvlTree::decrementTreeHeight(TreeNode* delNode) //TODO this is not logical, updating heights recursively won't work
+{
+	while (true)
+	{
+		if (delNode->getParent() != 0)
+		{
+			delNode->getParent()->decrementHeight();
+			decrementTreeHeight(delNode->getParent());
+			return;
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+
 int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a new balanceFactor
 {
-	int leftDepth = 0;
-	int rightDepth = 0;
-	computeBalanceFactor(myNode,leftDepth,true);
-	computeBalanceFactor(myNode,rightDepth,false);
-	return (leftDepth - rightDepth);
+	int leftHeight = 0;
+	int rightHeight = 0;
+
+	/*if (myNode->getLeftChild() != 0)
+	{
+		leftHeight = myNode->getLeftChild()->getHeight();
+	}
+
+	if (myNode->getRightChild() != 0)
+	{
+		rightHeight = myNode->getRightChild()->getHeight();
+	}*///TODO
+	computeBalanceFactor(myNode,leftHeight,true);
+	computeBalanceFactor(myNode,rightHeight,false);
+	return (leftHeight - rightHeight);
 }
 
 void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth, bool isLeftBranch)
@@ -317,45 +381,80 @@ void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth, bool isLe
 	//first compute left depth. If either child are valid, keep going
 	if (isLeftBranch)
 	{
-		while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0) //keep recursing as long as there is a valid child
+		if (myNode->getLeftChild() != 0)
 		{
-			if (myNode->getLeftChild() != 0)
-			{
-				branchDepth++;
-				computeBalanceFactor(myNode->getLeftChild(),branchDepth,isLeftBranch);
-				return;
-			}
-
-			if (branchDepth != 0 && myNode->getRightChild() != 0)
-			{
-				branchDepth++;
-				computeBalanceFactor(myNode->getRightChild(),branchDepth,isLeftBranch);
-				return;
-			}
+			branchDepth++;
+			computeBalanceFactor(myNode->getLeftChild(),branchDepth);
 			return;
 		}
+
+		/*if (branchDepth != 0 && myNode->getRightChild() != 0)
+		{
+			branchDepth++;
+			computeBalanceFactor(myNode->getRightChild(),branchDepth,isLeftBranch);
+			return;
+		}
+		return;*/
 	}
 
 	//then compute right depth. If either child are valid, keep going
 	else
 	{
-		while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0)
+		if (myNode->getRightChild() != 0)
+		{
+			branchDepth++;
+			computeBalanceFactor(myNode->getRightChild(),branchDepth);
+			return;
+		}
+
+		/*if (branchDepth != 0 && myNode->getLeftChild() != 0)
+		{
+			branchDepth++;
+			computeBalanceFactor(myNode->getLeftChild(),branchDepth,isLeftBranch);
+			return;
+		}
+		return;*/
+	}
+	return;
+}
+
+void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth) //search left or right based on bF
+{
+	while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0) //keep recursing as long as there is a valid child
+	{
+		if (myNode->getBalanceFactor() >= 0) //If bF is positive, look left first. Won't matter if 0, but should be covered
+		{
+			if (myNode->getLeftChild() != 0)
+			{
+				branchDepth++;
+				computeBalanceFactor(myNode->getLeftChild(),branchDepth);
+				return;
+			}
+
+			if (myNode->getRightChild() != 0)
+			{
+				branchDepth++;
+				computeBalanceFactor(myNode->getRightChild(),branchDepth);
+				return;
+			}
+		}
+		else //otherwise, bF should be negative, so look right first
 		{
 			if (myNode->getRightChild() != 0)
 			{
 				branchDepth++;
-				computeBalanceFactor(myNode->getRightChild(),branchDepth,isLeftBranch);
+				computeBalanceFactor(myNode->getRightChild(),branchDepth);
 				return;
 			}
 
-			if (branchDepth != 0 && myNode->getLeftChild() != 0)
+			if (myNode->getLeftChild() != 0)
 			{
 				branchDepth++;
-				computeBalanceFactor(myNode->getLeftChild(),branchDepth,isLeftBranch);
+				computeBalanceFactor(myNode->getLeftChild(),branchDepth);
 				return;
 			}
-			return;
 		}
+		return;
 	}
 }
 
@@ -450,11 +549,11 @@ void AvlTree::copyToArray(ResizeableArray<Eclipse> &myEclipses, TreeNode* firstN
 
 void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel up the parents to check for rotation cases
 {
-	TreeNode* curNode = insertedNode; //we start at the node that was added/removed
-	curNode->setBalanceFactor(computeBalanceFactor(curNode));
+	TreeNode* curNode = new TreeNode(*insertedNode); //we will start at the node that was added/removed
+	curNode->setBalanceFactor(computeBalanceFactor(insertedNode));
 	bool hasLeftChild = (insertedNode->getLeftChild() != 0);
 
-	if (abs(insertedNode->getBalanceFactor()) == 2 && (insertedNode->getLeftChild() != 0 || insertedNode->getRightChild() != 0))
+	if (abs(curNode->getBalanceFactor()) == 2 && (insertedNode->getLeftChild() != 0 || insertedNode->getRightChild() != 0))
 	//special case during removal @ delNode's parent where we should start at sibling
 	{
 		if (hasLeftChild)
@@ -471,36 +570,43 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 		}
 	}	//above will restart at the node that will catch the rotation
 
-	while (curNode->getParent() != 0) //continue updating and checking rotations until you reach the head node
+	while (true) //continue updating and checking rotations until you reach the head node
 	{
 		//tempNode will be child and recurse up to the next parent
-		tempNode = curNode; //TODO
-		curNode = curNode->getParent();
+		tempNode = curNode;
+		if (curNode->getParent() != 0)
+		{
+			curNode = curNode->getParent();
 
-		curNode->setBalanceFactor(computeBalanceFactor(curNode)); //update parent's bF before checking for rotation
+			curNode->setBalanceFactor(computeBalanceFactor(curNode)); //update parent's bF before checking for rotation
 
-		//Test for Left-Heavy rotation
-		if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == 2)
-		{
-			leftHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
-			return;
+			//Test for Left-Heavy rotation
+			if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == 2)
+			{
+				leftHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
+				return;
+			}
+			//Test for Left-Inner rotation
+			else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == 2)
+			{
+				leftInnerRotate(curNode); //rotate on sub-head node, return hasRotated
+				return;
+			}
+			//Test for Right-Heavy rotation
+			else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == -2)
+			{
+				rightHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
+				return;
+			}
+			//Test for Right-Inner rotation
+			else if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == -2)
+			{
+				rightInnerRotate(curNode); //rotate on sub-head node, return hasRotated
+				return;
+			}
 		}
-		//Test for Left-Inner rotation
-		else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == 2)
+		else
 		{
-			leftInnerRotate(curNode); //rotate on sub-head node, return hasRotated
-			return;
-		}
-		//Test for Right-Heavy rotation
-		else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == -2)
-		{
-			rightHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
-			return;
-		}
-		//Test for Right-Inner rotation
-		else if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == -2)
-		{
-			rightInnerRotate(curNode); //rotate on sub-head node, return hasRotated
 			return;
 		}
 	}

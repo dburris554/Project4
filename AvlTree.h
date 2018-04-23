@@ -40,8 +40,10 @@ private:
 	void printPostOrder(TreeNode* curNode); //recurse print post-order
 	void copyToArray(ResizeableArray<Eclipse>& myEclipses, TreeNode* firstNode);
 	void find(TreeNode* curNode, int key);
+	void decrementTreeHeight(TreeNode* delNode);//TODO
 	int computeBalanceFactor(TreeNode* myNode);
-	void computeBalanceFactor(TreeNode* myNode, int &branchDepth, bool isLeftBranch); //resolve infinite loop here
+	void computeBalanceFactor(TreeNode* myNode, int &branchDepth, bool isLeftBranch);
+	void computeBalanceFactor(TreeNode* myNode, int &branchDepth); //recurse based on bF
 	TreeNode* rootNode;
 	TreeNode* tempNode;
 };
