@@ -532,69 +532,63 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 		}
 	}	//above will restart at the node that will catch the rotation
 
-	while (true) //continue updating and checking rotations until you reach the head node
+	while (curNode->getParent() != 0) //continue updating and checking rotations until you reach the head node
 	{
 		//tempNode will be child and recurse up to the next parent
 		tempNode = curNode;
-		if (curNode->getParent() != 0)
+		curNode = curNode->getParent();
+
+		curNode->setBalanceFactor(computeBalanceFactor(curNode)); //update parent's bF before checking for rotation
+
+		//Test for Left-Heavy rotation
+		if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == 2)
 		{
-			curNode = curNode->getParent();
-
-			curNode->setBalanceFactor(computeBalanceFactor(curNode)); //update parent's bF before checking for rotation
-
-			//Test for Left-Heavy rotation
-			if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == 2)
-			{
-				leftHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
-				return;
-			}
-			//Test for Left-Inner rotation
-			else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == 2)
-			{
-				leftInnerRotate(curNode); //rotate on sub-head node, return hasRotated
-				return;
-			}
-			//Test for Right-Heavy rotation
-			else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == -2)
-			{
-				rightHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
-				return;
-			}
-			//Test for Right-Inner rotation
-			else if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == -2)
-			{
-				rightInnerRotate(curNode); //rotate on sub-head node, return hasRotated
-				return;
-			}
+			leftHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
 		}
-		else //check if rootNode (curNode here) needs to rotate
+		//Test for Left-Inner rotation
+		else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == 2)
 		{
-			bool isLeftChild = false; //if not comparable to getLeftChild, default tempNode as not left child
-			if (abs(curNode->getBalanceFactor()) == 2) //rootNode may have a bF of 2 after removal
-			{
-				if (curNode->getLeftChild() != 0) //only compare if exists
-				{
-					isLeftChild = (tempNode->getKey() == curNode->getLeftChild()->getKey());
-				}
+			leftInnerRotate(curNode); //rotate on sub-head node, return hasRotated
+		}
+		//Test for Right-Heavy rotation
+		else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == -2)
+		{
+			rightHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
 
-				if (isLeftChild) //if tempNode is a left child, check if root's right child exists,then recurse on the right child
-				{
-					if (curNode->getRightChild() != 0)
-					{
-						updateTree(curNode->getRightChild());
-					}
-				}
-				else //tempNode is a right child, so check the left child
-				{
-					if (curNode->getLeftChild() != 0)
-					{
-						updateTree(curNode->getLeftChild());
-					}
-				}
-			}
-			return;
+		}
+		//Test for Right-Inner rotation
+		else if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == -2)
+		{
+			rightInnerRotate(curNode); //rotate on sub-head node, return hasRotated
+
 		}
 	}
+	//check if rootNode (curNode here) needs to rotate
+
+	bool isLeftChild = false; //if not comparable to getLeftChild, default tempNode as not left child
+	if (abs(curNode->getBalanceFactor()) == 2) //rootNode may have a bF of 2 after removal
+	{
+		if (curNode->getLeftChild() != 0) //only compare if exists
+		{
+			isLeftChild = (tempNode->getKey() == curNode->getLeftChild()->getKey());
+		}
+
+		if (isLeftChild) //if tempNode is a left child, check if root's right child exists,then recurse on the right child
+		{
+			if (curNode->getRightChild() != 0)
+			{
+				updateTree(curNode->getRightChild());
+			}
+		}
+		else //tempNode is a right child, so check the left child
+		{
+			if (curNode->getLeftChild() != 0)
+			{
+				updateTree(curNode->getLeftChild());
+			}
+		}
+	}
+
 	return;
 }
 
