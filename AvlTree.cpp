@@ -362,65 +362,20 @@ int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a ne
 	int leftHeight = 0;
 	int rightHeight = 0;
 
-	/*if (myNode->getLeftChild() != 0)
+	if (myNode->getLeftChild() != 0)
 	{
-		leftHeight = myNode->getLeftChild()->getHeight();
+		computeBalanceFactor(myNode->getLeftChild(),++leftHeight);
 	}
-
 	if (myNode->getRightChild() != 0)
 	{
-		rightHeight = myNode->getRightChild()->getHeight();
-	}*///TODO
-	computeBalanceFactor(myNode,leftHeight,true);
-	computeBalanceFactor(myNode,rightHeight,false);
+		computeBalanceFactor(myNode->getRightChild(),++rightHeight);
+	}
 	return (leftHeight - rightHeight);
-}
-
-void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth, bool isLeftBranch)
-{
-	//first compute left depth. If either child are valid, keep going
-	if (isLeftBranch)
-	{
-		if (myNode->getLeftChild() != 0)
-		{
-			branchDepth++;
-			computeBalanceFactor(myNode->getLeftChild(),branchDepth);
-			return;
-		}
-
-		/*if (branchDepth != 0 && myNode->getRightChild() != 0)
-		{
-			branchDepth++;
-			computeBalanceFactor(myNode->getRightChild(),branchDepth,isLeftBranch);
-			return;
-		}
-		return;*/
-	}
-
-	//then compute right depth. If either child are valid, keep going
-	else
-	{
-		if (myNode->getRightChild() != 0)
-		{
-			branchDepth++;
-			computeBalanceFactor(myNode->getRightChild(),branchDepth);
-			return;
-		}
-
-		/*if (branchDepth != 0 && myNode->getLeftChild() != 0)
-		{
-			branchDepth++;
-			computeBalanceFactor(myNode->getLeftChild(),branchDepth,isLeftBranch);
-			return;
-		}
-		return;*/
-	}
-	return;
 }
 
 void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth) //search left or right based on bF
 {
-	while (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0) //keep recursing as long as there is a valid child
+	if (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0) //keep recursing as long as there is a valid child
 	{
 		if (myNode->getBalanceFactor() >= 0) //If bF is positive, look left first. Won't matter if 0, but should be covered
 		{

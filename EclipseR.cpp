@@ -72,7 +72,7 @@ int main()
 		input.close(); //input file is done being read
 
 		//Now make the ResizeableArray
-		myTree->copyToArray(myEclipses); //TODO may break
+		myTree->copyToArray(myEclipses);
 
 		//Now make the LinkedList
 		myEclipse = new Eclipse();
@@ -114,7 +114,7 @@ int main()
 				option_M(tmp,input,iFilename,myTree,myEclipse,lineNum,numDuplicates,totalLinesRead,totalValidLinesRead);
 
 				//Now make the ResizeableArray
-				myTree->copyToArray(myEclipses); //TODO may break
+				myTree->copyToArray(myEclipses);
 
 				//Now make the LinkedList
 				delete myList;
@@ -131,7 +131,7 @@ int main()
 						totalLinesRead,totalValidLinesRead);
 
 				//Now make the ResizeableArray
-				myTree->copyToArray(myEclipses); //TODO may break
+				myTree->copyToArray(myEclipses);
 
 				//Now make the LinkedList
 				delete myList;
@@ -304,6 +304,9 @@ bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, i
 		}
 		else //Remove from database
 		{
+			//TODO
+			if (myEclipse->getID() == 2048)
+			cout << "removing Eclipse id " << myEclipse->getID() << endl;
 			myTree->removeItem(myEclipse);
 		}
 	}
