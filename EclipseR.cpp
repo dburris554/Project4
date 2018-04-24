@@ -61,6 +61,7 @@ int main()
 		{
 			//Read the rest of the file
 			getline(input,tmp);
+			myEclipse = new Eclipse();
 			if (processLine(tmp,lineNum++,myTree,myEclipse,numDuplicates,true)) //returns goodData boolean
 			{
 				totalValidLinesRead++;
@@ -71,18 +72,18 @@ int main()
 		totalValidLinesRead -= numDuplicates; //subtract all of the duplicate entries from valid lines read
 		input.close(); //input file is done being read
 
-		//Now make the ResizeableArray
-		myTree->copyToArray(myEclipses);
-
-		//Now make the LinkedList
-		myEclipse = new Eclipse();
-		myList = new LinkedList(myEclipses,myEclipse);
-		delete myEclipse;
-
-		//Now make the HashMap
-		myMap = new HashMap(*myList,5); //2nd arg is bucket depth
-
 	} while(strlen(iFilename) != 0); //If user doesn't enter anything, proceed to Main Menu
+
+	//Now make the ResizeableArray
+	myTree->copyToArray(myEclipses);
+
+	//Now make the LinkedList
+	myEclipse = new Eclipse();
+	myList = new LinkedList(myEclipses,myEclipse);
+	delete myEclipse;
+
+	//Now make the HashMap
+	myMap = new HashMap(*myList,5); //2nd arg is bucket depth
 
 	if (myEclipses.getNumItems() > 0)	//If there is data read in, start the Main Menu, else exit
 	{
@@ -113,10 +114,11 @@ int main()
 			{
 				option_M(tmp,input,iFilename,myTree,myEclipse,lineNum,numDuplicates,totalLinesRead,totalValidLinesRead);
 
-				//Now make the ResizeableArray
+				//Now remake the ResizeableArray
+				myEclipses.clear();
 				myTree->copyToArray(myEclipses);
 
-				//Now make the LinkedList
+				//Now remake the LinkedList
 				delete myList;
 				myEclipse = new Eclipse();
 				myList = new LinkedList(myEclipses,myEclipse);
@@ -130,7 +132,8 @@ int main()
 				myTree = option_P(tmp,input,iFilename,myTree,myEclipse,lineNum,
 						totalLinesRead,totalValidLinesRead);
 
-				//Now make the ResizeableArray
+				//Now remake the ResizeableArray
+				myEclipses.clear();
 				myTree->copyToArray(myEclipses);
 
 				//Now make the LinkedList
@@ -291,11 +294,9 @@ bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, i
 			if (isDuplicate) //if a duplicate, increment counter, change that node's eclipse value
 			{
 				numDuplicates++;
-				myTree->setTempNode(myTree->findNode(myEclipse->getID())); //TODO
+				myTree->setTempNode(myTree->findNode(myEclipse->getID()));
 				myTree->getTempNode()->setKey(myEclipse->getID());
 				myTree->getTempNode()->setEclipse(myEclipse);
-				/*myTree->removeItem(tempEclipse);
-				myTree->addItem(myEclipse);*/ //TODO
 			}
 			else //otherwise, add as a new entry
 			{
@@ -304,16 +305,9 @@ bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, i
 		}
 		else //Remove from database
 		{
-			//TODO
-			if (myEclipse->getID() == 11897)
-			{
-				//cout << "removing Eclipse id " << myEclipse->getID() << endl;
-				cout << myTree->getRootNode()->getBalanceFactor() << endl;
-			}
 			myTree->removeItem(myEclipse);
 		}
 	}
-
 	return goodData;
 }
 
@@ -364,20 +358,35 @@ void option_O(string tmp, ofstream& output, char* oFilename, string* header[],
 	}
 	else //otherwise, print to console
 	{
-		for (int i = 0; i < 10; i++) // Print the header
+		if (myEclipses.getNumItems() > 0) //print this way if there is data to print
 		{
-			cout << *(header[i]);
-		}
+			for (int i = 0; i < 10; i++) // Print the header
+			{
+				cout << *(header[i]);
+			}
 
-		for (int i = 0; i < myEclipses.getNumItems(); ++i) // Print the body
+			for (int i = 0; i < myEclipses.getNumItems(); ++i) // Print the body
+			{
+				cout << myEclipses[i];
+			}
+
+			//Print the footer
+			cout << "Data lines read: " << totalLinesRead << "; Valid eclipses read: "
+				 << totalValidLinesRead << "; Eclipses in memory: " << myEclipses.getNumItems()
+				 << endl << endl;
+		}
+		else //print this way if no data to print
 		{
-			cout << myEclipses[i];
-		}
+			for (int i = 0; i < 10; i++) // Print the header
+			{
+				cout << *(header[i]);
+			}
 
-		//Print the footer
-		cout << "Data lines read: " << totalLinesRead << "; Valid eclipses read: "
-			 << totalValidLinesRead << "; Eclipses in memory: " << myEclipses.getNumItems()
-			 << endl << endl;
+			//Print the footer
+			cout << "Data lines read: " << totalLinesRead << "; Valid eclipses read: "
+				 << totalValidLinesRead << "; Eclipses in memory: " << myEclipses.getNumItems()
+				 << endl << endl;
+		}
 	}
 }
 
@@ -689,28 +698,28 @@ AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Ec
 		{
 			totalValidLinesRead++;
 
-			if (myTree->getRootNode() != 0)
+			if (myTree->getRootNode() != 0) //root has to exist to remake tree
 			{
-				if (myTree->getTempNode()->getKey() == myTree->getRootNode()->getKey())
+				if (myTree->getTempNode()->getKey() == myTree->getRootNode()->getKey()) //This condition is set in updateTree if
+																					//no rotation can fix the special balance issue
 				{
-					myTree->setTempTree(new AvlTree());
-					myTree->copyToTempTree(myTree->getRootNode());
-					myTree = myTree->getTempTree();
-					myTree->setTempTree(0);
+					myTree = remakeTree(myTree);
 				}
 			}
 		}
 		totalLinesRead++;
 	}
 	input.close(); //input file is done being read
+	return myTree;
 }
 
-void remakeTree(AvlTree* myTree)
+AvlTree* remakeTree(AvlTree* myTree)
 {
 	myTree->setTempTree(new AvlTree());
 	myTree->copyToTempTree(myTree->getRootNode());
 	myTree = myTree->getTempTree();
 	myTree->setTempTree(0);
+	return myTree;
 }
 
 void option_R(AvlTree* myTree) //prints AVLtree contents pre-order

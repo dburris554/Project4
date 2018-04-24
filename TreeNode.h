@@ -32,9 +32,6 @@ public:
 	void setKey(int myKey);
 	void setBalanceFactor(int myBalanceFactor);
 	int getBalanceFactor();
-	//void incrementHeight(); //TODO
-	//void decrementHeight(); //TODO
-	//int getHeight(); //TODO
 	TreeNode* operator=(const TreeNode& myNode);
 
 private:
@@ -44,7 +41,6 @@ private:
 	Eclipse* eclipse; //main data held in TreeNode
 	int key; //key for each node will be the Eclipse's ID number
 	int balanceFactor; //upon insertion and deletion, re-do balanceFactor
-	//int height; //allows easy and quick balance factor updates //TODO
 };
 
 #endif /* TREENODE_H_ */

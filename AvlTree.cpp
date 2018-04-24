@@ -42,23 +42,17 @@ void AvlTree::addItem(Eclipse* myEclipse)
 	{
 		TreeNode* curNode = rootNode; //curNode will travel down the tree to find insertion location
 		TreeNode* insertNode = new TreeNode(myEclipse); //insertNode will travel down the tree so balanceTree can be called
-		//TODO bool isOnlyChild = true;
 		
 		if (myEclipse->getID() > curNode->getKey()) //if this occurs, recurse right
 		{
 			if (curNode->getRightChild() == 0) //insert here if right child is 0
 			{
 				curNode->setRightChild(new TreeNode(curNode,myEclipse)); //don't use insertNode here to avoid extra line
-				//TODO curNode->incrementHeight(); //we will use height to determine balance factors
 				curNode->setBalanceFactor(computeBalanceFactor(curNode)); //guaranteed no rotations will happen here
 				return;
 			}
 
 			recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
-			/*if (isOnlyChild)
-			{
-				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
-			}*///TODO
 			//After right recursion return, update tree's bF's and rotations
 			updateTree(insertNode);
 		}
@@ -67,17 +61,11 @@ void AvlTree::addItem(Eclipse* myEclipse)
 			if (curNode->getLeftChild() == 0) //insert here if left child is 0
 			{
 				curNode->setLeftChild(new TreeNode(curNode,myEclipse)); //Don't use insertNode until recurseAdd
-				//TODO curNode->incrementHeight(); //we will use height to determine balance factors
 				curNode->setBalanceFactor(computeBalanceFactor(curNode)); //guaranteed no rotation will happen here
 				return;
 			}
 
 			recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
-			/*if (isOnlyChild)
-			{
-				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
-			}*///TODO
-			//After left recursion return, update tree's bF's and rotations
 			updateTree(insertNode);
 		}
 	}
@@ -89,40 +77,22 @@ void AvlTree::recurseAdd(TreeNode* curNode, TreeNode* insertNode, Eclipse* myEcl
 	{
 		if (curNode->getRightChild() == 0) //insert here if right child is 0
 		{
-			//TODO isOnlyChild = (curNode->getLeftChild() == 0); //test if inserted node will increment height
 			curNode->setRightChild(insertNode); //when assigning insertNode, need to assign parent relation
 			insertNode->setParent(curNode);
-			/*if (isOnlyChild)
-			{
-				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
-			}*///TODO
 			return;
 		}
 		recurseAdd(curNode->getRightChild(),insertNode,myEclipse);
-		/*if (isOnlyChild)
-		{
-			curNode->incrementHeight(); //tree height won't increase if inserted as a second child
-		}*///TODO
 		return;
 	}
 	else //otherwise, myEclipse ID should be < curNode's key, so recurse left
 	{
 		if (curNode->getLeftChild() == 0) //insert here if left child is 0
 		{
-			//TODO isOnlyChild = (curNode->getRightChild() == 0); //test if inserted node will increment height
 			curNode->setLeftChild(insertNode);
 			insertNode->setParent(curNode);
-			/*if (isOnlyChild)
-			{
-				curNode->incrementHeight(); //tree height won't increase if inserted as a second child
-			}*///TODO
 			return;
 		}
 		recurseAdd(curNode->getLeftChild(),insertNode,myEclipse);
-		/*if (isOnlyChild)
-		{
-			curNode->incrementHeight(); //tree height won't increase if inserted as a second child
-		}*///TODO
 		return;
 	}
 }
@@ -153,16 +123,6 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 		return;
 	}
 	
-	//TODO Since delNode is now valid, check if is an only child. If so, decrement tree height
-	/*if (delNode->getParent() != 0) //make sure not the root
-	{
-		if (!(delNode->getParent()->getLeftChild() != 0 && delNode->getParent()->getRightChild() != 0))
-			//if delNode's parent doesn't have two children, then delNode must be an only child
-		{
-			decrementTreeHeight(delNode);
-		}
-	}*/
-
 	//Leaf Node case
 	if (delNode->getLeftChild() == 0 && delNode->getRightChild() == 0) //delNode is a leaf node
 	{
@@ -355,23 +315,6 @@ void AvlTree::find(TreeNode* curNode, int key)
 	}
 	return;
 }
-
-/*void AvlTree::decrementTreeHeight(TreeNode* delNode) //TODO this is not logical, updating heights recursively won't work
-{
-	while (true)
-	{
-		if (delNode->getParent() != 0)
-		{
-			delNode->getParent()->decrementHeight();
-			decrementTreeHeight(delNode->getParent());
-			return;
-		}
-		else
-		{
-			return;
-		}
-	}
-}*/
 
 int AvlTree::computeBalanceFactor(TreeNode* myNode) //Use this to calculate a new balanceFactor
 {
@@ -603,7 +546,7 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 		}
 	}
 	//check if rootNode (curNode here) needs to rotate
-	if (abs(curNode->getBalanceFactor()) == 2) //in this case, rootNode should have a left and right child
+	if (abs(curNode->getBalanceFactor()) == 2)
 	{
 		if (curNode->getBalanceFactor() == 2) //check if left branch will rotate
 		{
@@ -623,11 +566,11 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 
 		if (curNode->getBalanceFactor() == -2) //check if right branch will rotate
 		{
-			if (curNode->getLeftChild()->getBalanceFactor() == -1) //Right-Heavy rotate
+			if (curNode->getRightChild()->getBalanceFactor() == -1) //Right-Heavy rotate
 			{
 				rightHeavyRotate(curNode);
 			}
-			else if (curNode->getLeftChild()->getBalanceFactor() == 1) //Right-Inner rotate
+			else if (curNode->getRightChild()->getBalanceFactor() == 1) //Right-Inner rotate
 			{
 				rightInnerRotate(curNode);
 			}
@@ -851,107 +794,3 @@ void AvlTree::rightInnerRotate(TreeNode* nodeA)
 	nodeB->setBalanceFactor(0);
 	nodeC->setBalanceFactor(0);
 }
-
-void AvlTree::rootReassignRotate(TreeNode* myRoot)
-{
-	//TODO
-	TreeNode* newRoot = myRoot->getRightChild();
-	TreeNode* succNode = newRoot;
-	while (succNode->getLeftChild() != 0)
-	{
-		succNode = succNode->getLeftChild();
-	}
-	while (tempNode->getLeftChild() != 0)
-	{
-		tempNode = tempNode->getLeftChild();
-	}
-	//make myRoot a child of succNode, then create new root
-	myRoot->setParent(succNode);
-	succNode->setLeftChild(myRoot);
-	myRoot->setRightChild(0);
-	newRoot->setParent(0);
-	rootNode = newRoot;
-}
-/*----------------------------------------------------------------
-int main() {
-	string* myString1 = new string[18];
-	string* myString2 = new string[18];
-	string* myString3 = new string[18];
-	string* myString4 = new string[18];
-	string* myString5 = new string[18];
-	string* myString6 = new string[18];
-	string* myString7 = new string[18];
-	string* myString8 = new string[18];
-	string* myString9 = new string[18];
-	string* myString10 = new string[18];
-	string* myString11 = new string[18];
-	string* myString12 = new string[18];
-	for (int i = 0; i < 18; i++)
-	{
-		myString1[i] = "1";
-		myString2[i] = "2";
-		myString3[i] = "3";
-		myString4[i] = "4";
-		myString5[i] = "5";
-		myString6[i] = "6";
-		myString7[i] = "7";
-		myString8[i] = "8";
-		myString9[i] = "9";
-		myString10[i] = "10";
-		myString11[i] = "11";
-		myString12[i] = "12";
-	}
-	Eclipse* myEclipse1 = new Eclipse(myString1);
-	Eclipse* myEclipse2 = new Eclipse(myString2);
-	Eclipse* myEclipse3 = new Eclipse(myString3);
-	Eclipse* myEclipse4 = new Eclipse(myString4);
-	Eclipse* myEclipse5 = new Eclipse(myString5);
-	Eclipse* myEclipse6 = new Eclipse(myString6);
-	Eclipse* myEclipse7 = new Eclipse(myString7);
-	Eclipse* myEclipse8 = new Eclipse(myString8);
-	Eclipse* myEclipse9 = new Eclipse(myString9);
-	Eclipse* myEclipse10 = new Eclipse(myString10);
-	Eclipse* myEclipse11 = new Eclipse(myString11);
-	Eclipse* myEclipse12 = new Eclipse(myString12);
-
-	AvlTree* myTree = new AvlTree();
-	myTree->addItem(myEclipse1);
-	myTree->addItem(myEclipse3);
-	myTree->addItem(myEclipse5);
-	myTree->addItem(myEclipse7);
-	myTree->addItem(myEclipse9);
-	myTree->addItem(myEclipse11);
-	myTree->addItem(myEclipse12);
-	myTree->addItem(myEclipse2);
-	myTree->addItem(myEclipse4);
-	myTree->addItem(myEclipse10);
-	myTree->addItem(myEclipse6);
-	myTree->addItem(myEclipse8);
-
-	cout << "Printing Pre-Order..." << endl;
-	myTree->printPreOrder();
-	cout << "Printing In-Order..." << endl;
-	myTree->printInOrder();
-	cout << "Printing Post-Order..." << endl;
-	myTree->printPostOrder();
-
-	cout << "Deleting nodes..." << endl;
-	myTree->removeItem(myEclipse2);
-	myTree->removeItem(myEclipse4);
-	myTree->removeItem(myEclipse6);
-	myTree->removeItem(myEclipse12);
-	myTree->removeItem(myEclipse10);
-	myTree->removeItem(myEclipse8);
-	myTree->removeItem(myEclipse10);
-
-	cout << "Re-printing Pre-Order..." << endl;
-	myTree->printPreOrder();
-
-	cout << "Done.";
-
-
-
-	return 0;
-}
-//----------------------------------------------------------------*/
-
