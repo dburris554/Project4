@@ -11,9 +11,25 @@ AvlTree::AvlTree()
 {
 	rootNode = 0;
 	tempNode = 0;
+	tempTree = 0;
+}
+
+AvlTree::AvlTree(const AvlTree* oldTree)
+{
+	rootNode = oldTree->rootNode;
+	tempNode = oldTree->tempNode;
+	tempTree = 0;
 }
 
 AvlTree::~AvlTree() {}
+
+AvlTree* AvlTree::operator=(const AvlTree* myTree)
+{
+	rootNode = myTree->rootNode;
+	tempNode = myTree->tempNode;
+	tempTree = 0;
+	return this;
+}
 
 void AvlTree::addItem(Eclipse* myEclipse)
 {
@@ -377,7 +393,7 @@ void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth) //search 
 {
 	if (myNode->getLeftChild() != 0 || myNode->getRightChild() != 0) //keep recursing as long as there is a valid child
 	{
-		if (myNode->getBalanceFactor() >= 0) //If bF is positive, look left first. Won't matter if 0, but should be covered
+		if (myNode->getBalanceFactor() > 0) //If bF is positive, look left first
 		{
 			if (myNode->getLeftChild() != 0)
 			{
@@ -393,7 +409,7 @@ void AvlTree::computeBalanceFactor(TreeNode* myNode, int &branchDepth) //search 
 				return;
 			}
 		}
-		else //otherwise, bF should be negative, so look right first
+		else //otherwise, bF should be negative or 0, so look right first
 		{
 			if (myNode->getRightChild() != 0)
 			{
@@ -509,6 +525,31 @@ void AvlTree::copyToArray(ResizeableArray<Eclipse>& myEclipses, TreeNode* firstN
 	}
 }
 
+void AvlTree::copyToTempTree(TreeNode* curNode)
+{
+	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
+	{
+		copyToTempTree(curNode->getLeftChild());
+	}
+
+	tempTree->addItem(curNode->getEclipse());
+
+	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
+	{
+		copyToTempTree(curNode->getRightChild());
+	}
+}
+
+void AvlTree::setTempTree(AvlTree* myTempTree)
+{
+	tempTree = myTempTree;
+}
+
+AvlTree* AvlTree::getTempTree()
+{
+	return tempTree;
+}
+
 void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel up the parents to check for rotation cases
 {
 	insertedNode->setBalanceFactor(computeBalanceFactor(insertedNode));
@@ -554,41 +595,48 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 		else if (tempNode->getBalanceFactor() == -1 && curNode->getBalanceFactor() == -2)
 		{
 			rightHeavyRotate(curNode); //rotate on sub-head node, return hasRotated
-
 		}
 		//Test for Right-Inner rotation
 		else if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == -2)
 		{
 			rightInnerRotate(curNode); //rotate on sub-head node, return hasRotated
-
 		}
 	}
 	//check if rootNode (curNode here) needs to rotate
-
-	bool isLeftChild = false; //if not comparable to getLeftChild, default tempNode as not left child
-	if (abs(curNode->getBalanceFactor()) == 2) //rootNode may have a bF of 2 after removal
+	if (abs(curNode->getBalanceFactor()) == 2) //in this case, rootNode should have a left and right child
 	{
-		if (curNode->getLeftChild() != 0) //only compare if exists
+		if (curNode->getBalanceFactor() == 2) //check if left branch will rotate
 		{
-			isLeftChild = (tempNode->getKey() == curNode->getLeftChild()->getKey());
-		}
-
-		if (isLeftChild) //if tempNode is a left child, check if root's right child exists,then recurse on the right child
-		{
-			if (curNode->getRightChild() != 0)
+			if (curNode->getLeftChild()->getBalanceFactor() == 1) //Left-Heavy rotate
 			{
-				updateTree(curNode->getRightChild());
+				leftHeavyRotate(curNode);
+			}
+			else if (curNode->getLeftChild()->getBalanceFactor() == -1) //Left-Inner rotate
+			{
+				leftInnerRotate(curNode);
+			}
+			else //no known rotation; prepare to remake tree
+			{
+				tempNode = rootNode;
 			}
 		}
-		else //tempNode is a right child, so check the left child
+
+		if (curNode->getBalanceFactor() == -2) //check if right branch will rotate
 		{
-			if (curNode->getLeftChild() != 0)
+			if (curNode->getLeftChild()->getBalanceFactor() == -1) //Right-Heavy rotate
 			{
-				updateTree(curNode->getLeftChild());
+				rightHeavyRotate(curNode);
+			}
+			else if (curNode->getLeftChild()->getBalanceFactor() == 1) //Right-Inner rotate
+			{
+				rightInnerRotate(curNode);
+			}
+			else //no known rotation; prepare to remake tree
+			{
+				tempNode = rootNode;
 			}
 		}
 	}
-
 	return;
 }
 
@@ -802,6 +850,27 @@ void AvlTree::rightInnerRotate(TreeNode* nodeA)
 	nodeA->setBalanceFactor(0);
 	nodeB->setBalanceFactor(0);
 	nodeC->setBalanceFactor(0);
+}
+
+void AvlTree::rootReassignRotate(TreeNode* myRoot)
+{
+	//TODO
+	TreeNode* newRoot = myRoot->getRightChild();
+	TreeNode* succNode = newRoot;
+	while (succNode->getLeftChild() != 0)
+	{
+		succNode = succNode->getLeftChild();
+	}
+	while (tempNode->getLeftChild() != 0)
+	{
+		tempNode = tempNode->getLeftChild();
+	}
+	//make myRoot a child of succNode, then create new root
+	myRoot->setParent(succNode);
+	succNode->setLeftChild(myRoot);
+	myRoot->setRightChild(0);
+	newRoot->setParent(0);
+	rootNode = newRoot;
 }
 /*----------------------------------------------------------------
 int main() {

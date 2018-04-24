@@ -15,7 +15,9 @@ class AvlTree {
 
 public:
 	AvlTree();
+	AvlTree(const AvlTree* oldTree);
 	virtual ~AvlTree();
+	AvlTree* operator=(const AvlTree* mytree);
 	void addItem(Eclipse* myEclipse);
 	TreeNode* getRootNode();
 	TreeNode* getTempNode();
@@ -27,6 +29,9 @@ public:
 	void printInOrder();
 	void printPostOrder();
 	void copyToArray(ResizeableArray<Eclipse>& myEclipses);
+	void copyToTempTree(TreeNode* curNode);
+	void setTempTree(AvlTree* myTempTree);
+	AvlTree* getTempTree();
 
 private:
 	void updateTree(TreeNode* insertedNode); //starts at inserted/deleted location, updates balanceFactors and checks for rotations back to rootNode
@@ -34,6 +39,7 @@ private:
 	void leftInnerRotate(TreeNode* nodeA);
 	void rightHeavyRotate(TreeNode* nodeA);
 	void rightInnerRotate(TreeNode* nodeA);
+	void rootReassignRotate(TreeNode* myRoot);
 	void recurseAdd(TreeNode* curNode,TreeNode* insertNode, Eclipse* myEclipse); //use to simplify addItem recursion
 	void printPreOrder(TreeNode* curNode); //recurse print for pre-order
 	void printInOrder(TreeNode* curNode); //recurse print in-order
@@ -45,6 +51,7 @@ private:
 	void computeBalanceFactor(TreeNode* myNode, int &branchDepth); //recurse based on bF
 	TreeNode* rootNode;
 	TreeNode* tempNode;
+	AvlTree* tempTree;
 };
 
 #endif /* AVLTREE_H_ */

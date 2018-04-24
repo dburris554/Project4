@@ -127,7 +127,7 @@ int main()
 			}
 			else if (userChoice == "P" || userChoice == "p") //purges files from dataset
 			{
-				option_P(tmp,input,iFilename,myTree,myEclipse,lineNum,
+				myTree = option_P(tmp,input,iFilename,myTree,myEclipse,lineNum,
 						totalLinesRead,totalValidLinesRead);
 
 				//Now make the ResizeableArray
@@ -305,8 +305,11 @@ bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, i
 		else //Remove from database
 		{
 			//TODO
-			if (myEclipse->getID() == 2048)
-			cout << "removing Eclipse id " << myEclipse->getID() << endl;
+			if (myEclipse->getID() == 11897)
+			{
+				//cout << "removing Eclipse id " << myEclipse->getID() << endl;
+				cout << myTree->getRootNode()->getBalanceFactor() << endl;
+			}
 			myTree->removeItem(myEclipse);
 		}
 	}
@@ -644,7 +647,7 @@ void option_M(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclips
 	input.close(); //input file is done being read
 }
 
-void option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,
+AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,
 		int& totalLinesRead, int& totalValidLinesRead)
 {
 	//Prompt for a data file, verify the file, and attempt to purge the eclipses from LinkedList. If the
@@ -658,7 +661,7 @@ void option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclips
 	if (myTree->getRootNode() == 0)
 	{
 		cerr << "There is no data to purge!" << endl;
-		return;
+		return myTree;
 	}
 
 	cout << "Please enter a purge file name: " << endl;
@@ -670,7 +673,7 @@ void option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclips
 	if(!input.is_open()) //Check to see that the file opened correctly
 	{
 		cerr << "File '" << iFilename << "' is not available." << endl << endl;
-		return; //Go back to the main menu
+		return myTree; //Go back to the main menu
 	}
 		//Now we know the file read in is valid.
 	for (int i = 0; i < 10; i++) // Read through the first 10 lines
@@ -685,10 +688,29 @@ void option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclips
 		if (processLine(tmp,lineNum++,myTree,myEclipse,numDuplicates,false)) //returns goodData boolean
 		{
 			totalValidLinesRead++;
+
+			if (myTree->getRootNode() != 0)
+			{
+				if (myTree->getTempNode()->getKey() == myTree->getRootNode()->getKey())
+				{
+					myTree->setTempTree(new AvlTree());
+					myTree->copyToTempTree(myTree->getRootNode());
+					myTree = myTree->getTempTree();
+					myTree->setTempTree(0);
+				}
+			}
 		}
 		totalLinesRead++;
 	}
 	input.close(); //input file is done being read
+}
+
+void remakeTree(AvlTree* myTree)
+{
+	myTree->setTempTree(new AvlTree());
+	myTree->copyToTempTree(myTree->getRootNode());
+	myTree = myTree->getTempTree();
+	myTree->setTempTree(0);
 }
 
 void option_R(AvlTree* myTree) //prints AVLtree contents pre-order

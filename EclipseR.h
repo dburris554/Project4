@@ -28,8 +28,9 @@ bool customCompare(string A, string B, int colChoice);
 void option_F(ResizeableArray<Eclipse>& myEclipses, int sortedCol, string* header[], HashMap* myMap);
 void option_M(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,int& numDuplicates,
 	int& totalLinesRead,int& totalValidLinesRead);
-void option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,
+AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,
 	int& totalLinesRead, int& totalValidLinesRead);
+void remakeTree(AvlTree* myTree);
 void option_R(AvlTree* myTree);
 void option_C(AvlTree* myTree);
 void option_T(AvlTree* myTree);
