@@ -67,6 +67,7 @@ int main()
 				totalValidLinesRead++;
 			}
 			totalLinesRead++;
+
 			delete myEclipse;
 		}
 		totalValidLinesRead -= numDuplicates; //subtract all of the duplicate entries from valid lines read

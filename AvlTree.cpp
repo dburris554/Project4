@@ -745,11 +745,7 @@ void AvlTree::rightInnerRotate(TreeNode* nodeA)
 	if (!isRoot)
 	{
 		parentOfA = nodeA->getParent();
-		if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
-		{
-			isRightChild = true;
-		}
-		else (isRightChild = false);
+		isRightChild = (parentOfA->getRightChild()->getKey() == nodeA->getKey());
 	}
 	TreeNode* nodeB = nodeA->getRightChild();
 	TreeNode* nodeC = nodeB->getLeftChild();
