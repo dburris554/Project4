@@ -699,14 +699,14 @@ AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Ec
 		{
 			totalValidLinesRead++;
 
-			if (myTree->getRootNode() != 0) //root has to exist to remake tree
+			/*if (myTree->getRootNode() != 0) //root has to exist to remake tree
 			{
 				if (myTree->getTempNode()->getKey() == myTree->getRootNode()->getKey()) //This condition is set in updateTree if
 																					//no rotation can fix the special balance issue
 				{
 					myTree = remakeTree(myTree);
 				}
-			}
+			}*///TODO
 		}
 		totalLinesRead++;
 	}

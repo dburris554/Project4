@@ -39,6 +39,8 @@ private:
 	void leftInnerRotate(TreeNode* nodeA); //rotation when bF are -1 -> 2
 	void rightHeavyRotate(TreeNode* nodeA); //rotation when bF are -1 -> -2
 	void rightInnerRotate(TreeNode* nodeA); //rotation when bF are 1 -> -2
+	void lHRemovalRotate(TreeNode* nodeA); //TODO
+	void rHRemovalRotate(TreeNode* nodeA); //TODO
 	void recurseAdd(TreeNode* curNode,TreeNode* insertNode, Eclipse* myEclipse); //use to simplify addItem recursion
 	void printPreOrder(TreeNode* curNode); //recurse print for pre-order
 	void printInOrder(TreeNode* curNode); //recurse print in-order

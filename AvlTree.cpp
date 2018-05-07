@@ -560,7 +560,8 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 			}
 			else //no known rotation; prepare to remake tree
 			{
-				tempNode = rootNode;
+				//tempNode = rootNode;//TODO
+				lHRemovalRotate(curNode);
 			}
 		}
 
@@ -576,7 +577,8 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 			}
 			else //no known rotation; prepare to remake tree
 			{
-				tempNode = rootNode;
+				//tempNode = rootNode;
+				rHRemovalRotate(curNode);
 			}
 		}
 	}
@@ -784,6 +786,102 @@ void AvlTree::rightInnerRotate(TreeNode* nodeA)
 	{
 		nodeC->setParent(0);
 		rootNode = nodeC;
+	}
+
+	nodeA->setBalanceFactor(0);
+	nodeB->setBalanceFactor(0);
+	nodeC->setBalanceFactor(0);
+}
+
+void AvlTree::lHRemovalRotate(TreeNode* nodeA)
+{
+	bool isRoot = (nodeA->getParent() == 0); //edge case is that nodeA is the root
+	TreeNode* parentOfA;
+	bool isRightChild; //check whether nodeA is a left child
+	if (!isRoot)
+	{
+		parentOfA = nodeA->getParent();
+		isRightChild = (parentOfA->getRightChild()->getKey() == nodeA->getKey());
+	}
+
+	TreeNode* nodeB = nodeA->getRightChild();
+	TreeNode* nodeC = nodeB->getLeftChild();
+
+	if (!isRoot)
+	{
+		nodeA->setParent(nodeB);
+		nodeB->setLeftChild(nodeA);
+		nodeA->setRightChild(nodeC);
+		nodeC->setParent(nodeA);
+		nodeB->setParent(parentOfA);
+
+		if (isRightChild)
+		{
+			parentOfA->setRightChild(nodeB);
+		}
+		else //otherwise nodeA was a left child
+		{
+			parentOfA->setLeftChild(nodeB);
+		}
+	}
+	else //nodeA is the root
+	{
+		nodeA->setParent(nodeB);
+		nodeB->setLeftChild(nodeA);
+		nodeC->setParent(nodeA);
+		nodeA->setRightChild(nodeC);
+		nodeB->setParent(0);
+		rootNode = nodeB;
+	}
+
+	nodeA->setBalanceFactor(0);
+	nodeB->setBalanceFactor(0);
+	nodeC->setBalanceFactor(0);
+}
+
+void AvlTree::rHRemovalRotate(TreeNode* nodeA)
+{
+	bool isRoot = (nodeA->getParent() == 0); //edge case is that nodeA is the root
+	TreeNode* parentOfA;
+	bool isLeftChild; //check whether nodeA is a left child
+	if (!isRoot)
+	{
+		parentOfA = nodeA->getParent();
+		if (parentOfA->getLeftChild()->getKey() == nodeA->getKey())
+		{
+			isLeftChild = true;
+		}
+		else (isLeftChild = false);
+	}
+
+	TreeNode* nodeB = nodeA->getLeftChild();
+	TreeNode* nodeC = nodeB->getRightChild();
+
+	if (!isRoot)
+	{
+		nodeA->setParent(nodeB);
+		nodeB->setRightChild(nodeA);
+		nodeC->setParent(nodeA);
+		nodeA->setLeftChild(nodeC);
+		nodeB->setParent(parentOfA);
+
+		if (isLeftChild)
+		{
+			parentOfA->setLeftChild(nodeB);
+		}
+		else //nodeA was a right child
+		{
+			parentOfA->setRightChild(nodeA);
+		}
+	}
+	else //nodeA is the root
+	{
+		nodeA->setParent(nodeB);
+		nodeB->setRightChild(nodeA);
+		nodeC->setParent(nodeA);
+		nodeA->setLeftChild(nodeC);
+		nodeB->setParent(0);
+		rootNode = nodeB;
 	}
 
 	nodeA->setBalanceFactor(0);
