@@ -215,12 +215,14 @@ void AvlTree::removeItem(Eclipse* myEclipse)
 			if (hasLeftChild)
 			{
 				rootNode = delNode->getLeftChild();
+				rootNode->setParent(0);
 				delNode = 0;
 				updateTree(rootNode);
 			}
 			else
 			{
 				rootNode = delNode->getRightChild();
+				rootNode->setParent(0);
 				delNode = 0;
 				updateTree(rootNode);
 			}
@@ -543,6 +545,16 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 		else if (tempNode->getBalanceFactor() == 1 && curNode->getBalanceFactor() == -2)
 		{
 			rightInnerRotate(curNode); //rotate on sub-head node, return hasRotated
+		}
+		//Test for Left-Heavy Removal rotation
+		else if (tempNode->getBalanceFactor() == 0 && curNode->getBalanceFactor() == -2)
+		{
+			lHRemovalRotate(curNode); //rotate on sub-head node, return hasRotated
+		}
+		//Test for Right-Heavy Removal rotation
+		else if (tempNode->getBalanceFactor() == 0 && curNode->getBalanceFactor() == 2)
+		{
+			rHRemovalRotate(curNode); //rotate on sub-head node, return hasRotated
 		}
 	}
 	//check if rootNode (curNode here) needs to rotate
