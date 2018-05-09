@@ -10,26 +10,10 @@
 AvlTree::AvlTree()
 {
 	rootNode = 0;
-	tempNode = 0;
-	tempTree = 0;
-}
-
-AvlTree::AvlTree(const AvlTree* oldTree)
-{
-	rootNode = oldTree->rootNode;
-	tempNode = oldTree->tempNode;
-	tempTree = 0;
+	tempNode = 0;;
 }
 
 AvlTree::~AvlTree() {}
-
-AvlTree* AvlTree::operator=(const AvlTree* myTree)
-{
-	rootNode = myTree->rootNode;
-	tempNode = myTree->tempNode;
-	tempTree = 0;
-	return this;
-}
 
 void AvlTree::addItem(Eclipse* myEclipse)
 {
@@ -470,31 +454,6 @@ void AvlTree::copyToArray(ResizeableArray<Eclipse>& myEclipses, TreeNode* firstN
 	}
 }
 
-void AvlTree::copyToTempTree(TreeNode* curNode)
-{
-	if (curNode->getLeftChild() != 0) //only check left subtrees if not 0
-	{
-		copyToTempTree(curNode->getLeftChild());
-	}
-
-	tempTree->addItem(curNode->getEclipse());
-
-	if (curNode->getRightChild() != 0) //only check right subtrees if not 0
-	{
-		copyToTempTree(curNode->getRightChild());
-	}
-}
-
-void AvlTree::setTempTree(AvlTree* myTempTree)
-{
-	tempTree = myTempTree;
-}
-
-AvlTree* AvlTree::getTempTree()
-{
-	return tempTree;
-}
-
 void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel up the parents to check for rotation cases
 {
 	insertedNode->setBalanceFactor(computeBalanceFactor(insertedNode));
@@ -570,9 +529,8 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 			{
 				leftInnerRotate(curNode);
 			}
-			else //no known rotation; prepare to remake tree
+			else
 			{
-				//tempNode = rootNode;//TODO
 				lHRemovalRotate(curNode);
 			}
 		}
@@ -587,9 +545,8 @@ void AvlTree::updateTree(TreeNode* insertedNode) //start from insertion, travel 
 			{
 				rightInnerRotate(curNode);
 			}
-			else //no known rotation; prepare to remake tree
+			else
 			{
-				//tempNode = rootNode;
 				rHRemovalRotate(curNode);
 			}
 		}

@@ -30,7 +30,6 @@ void option_M(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclips
 	int& totalLinesRead,int& totalValidLinesRead);
 AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,
 	int& totalLinesRead, int& totalValidLinesRead);
-AvlTree* remakeTree(AvlTree* myTree);
 void option_R(AvlTree* myTree);
 void option_C(AvlTree* myTree);
 void option_T(AvlTree* myTree);

@@ -15,9 +15,7 @@ class AvlTree {
 
 public:
 	AvlTree();
-	AvlTree(const AvlTree* oldTree); //deep copy constructor
 	virtual ~AvlTree();
-	AvlTree* operator=(const AvlTree* mytree); //corresponding assignment operator
 	void addItem(Eclipse* myEclipse); //adds objects to tree
 	TreeNode* getRootNode();
 	TreeNode* getTempNode(); //tempNode allows simple coding for find and recursive calls
@@ -29,9 +27,6 @@ public:
 	void printInOrder(); //Prints are mainly for debugging
 	void printPostOrder();
 	void copyToArray(ResizeableArray<Eclipse>& myEclipses); //copy data in-order to Resizeable array
-	void copyToTempTree(TreeNode* curNode); //temp tree is used to hold tree data while remaking the original
-	void setTempTree(AvlTree* myTempTree);
-	AvlTree* getTempTree();
 
 private:
 	void updateTree(TreeNode* insertedNode); //starts at inserted/deleted location, updates balanceFactors and checks for rotations back to rootNode
@@ -51,7 +46,6 @@ private:
 	void computeBalanceFactor(TreeNode* myNode, int &branchDepth); //recurse based on bF
 	TreeNode* rootNode; //holds the root of the AvlTree
 	TreeNode* tempNode; //holds nodes during find and recursive calls
-	AvlTree* tempTree; //initialized and used when remaking the tree
 };
 
 #endif /* AVLTREE_H_ */

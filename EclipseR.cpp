@@ -698,30 +698,10 @@ AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Ec
 		if (processLine(tmp,lineNum++,myTree,myEclipse,numDuplicates,false)) //returns goodData boolean
 		{
 			totalValidLinesRead++;
-				if (lineNum == 11897)
-					tmp = "temp";
-
-			/*if (myTree->getRootNode() != 0) //root has to exist to remake tree
-			{
-				if (myTree->getTempNode()->getKey() == myTree->getRootNode()->getKey()) //This condition is set in updateTree if
-																					//no rotation can fix the special balance issue
-				{
-					myTree = remakeTree(myTree);
-				}
-			}*///TODO
 		}
 		totalLinesRead++;
 	}
 	input.close(); //input file is done being read
-	return myTree;
-}
-
-AvlTree* remakeTree(AvlTree* myTree)
-{
-	myTree->setTempTree(new AvlTree());
-	myTree->copyToTempTree(myTree->getRootNode());
-	myTree = myTree->getTempTree();
-	myTree->setTempTree(0);
 	return myTree;
 }
 
