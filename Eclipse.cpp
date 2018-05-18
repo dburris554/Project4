@@ -63,6 +63,42 @@ Eclipse* Eclipse::operator= (const Eclipse& myEclipse) //Overloaded assignment o
 	return this;
 }
 
+bool Eclipse::operator==(Eclipse myEclipse)
+{
+	if (this->getID() == myEclipse.getID())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Eclipse::operator<(Eclipse myEclipse)
+{
+	if (this->getID() < myEclipse.getID())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Eclipse::operator>(Eclipse myEclipse)
+{
+	if (this->getID() > myEclipse.getID())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 Eclipse::Eclipse()
 {
 	this->linePointer = 0;

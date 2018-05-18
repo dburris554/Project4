@@ -22,7 +22,7 @@ int main()
 	int totalValidLinesRead = 0; //total valid lines in input file
 	int sortedCol = -1; //column previously sorted
 	ResizeableArray<Eclipse> myEclipses; //Data structure used for searching and sorting
-	AvlTree* myTree = new AvlTree(); //Data structure used to store Eclipse data and for Merging/Purging
+	AvlTree<Eclipse>* myTree = new AvlTree<Eclipse>(); //Data structure used to store Eclipse data and for Merging/Purging
 	LinkedList* myList = new LinkedList(); //Data structure sent into HashMap to initialize the map
 	HashMap* myMap; //HashMap for Eclipse ID constant search time, declare here and initialize later
 	Eclipse* myEclipse = 0; //Eclipse sent into processLine to store Eclipses into LinkedList
@@ -180,7 +180,7 @@ int main()
 	return 0;
 }
 /////////////////////////// Method Implementations ////////////////////////////
-bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, int& numDuplicates, bool toAdd)
+bool processLine(string tmp, int lineNum, AvlTree<Eclipse>* myTree, Eclipse* myEclipse, int& numDuplicates, bool toAdd)
 {
 	if (tmp == "") //If the line of the file is empty, return 'badData'
 	{
@@ -285,7 +285,7 @@ bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, i
 
 		if (toAdd) //Add to database
 		{
-			Eclipse* tempEclipse = myTree->findEclipse(myEclipse->getID());
+			Eclipse* tempEclipse = myTree->findData(myEclipse->getID());
 			bool isDuplicate = false;
 
 			if (!(tempEclipse->getIsBlank())) //only compare if returns a valid Eclipse
@@ -297,16 +297,16 @@ bool processLine(string tmp, int lineNum, AvlTree* myTree, Eclipse* myEclipse, i
 				numDuplicates++;
 				myTree->setTempNode(myTree->findNode(myEclipse->getID()));
 				myTree->getTempNode()->setKey(myEclipse->getID());
-				myTree->getTempNode()->setEclipse(myEclipse);
+				myTree->getTempNode()->setData(myEclipse);
 			}
 			else //otherwise, add as a new entry
 			{
-				myTree->addItem(myEclipse);
+				myTree->addItem(myEclipse,myEclipse->getID());
 			}
 		}
 		else //Remove from database
 		{
-			myTree->removeItem(myEclipse);
+			myTree->removeItem(myEclipse,myEclipse->getID());
 		}
 	}
 	return goodData;
@@ -617,7 +617,7 @@ void option_F(ResizeableArray<Eclipse>& myEclipses, int sortedCol, string* heade
 	}
 }
 
-void option_M(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,int& numDuplicates,
+void option_M(string tmp,ifstream& input,char iFilename[],AvlTree<Eclipse>* myTree,Eclipse* myEclipse,int lineNum,int& numDuplicates,
 		int& totalLinesRead, int& totalValidLinesRead)
 {
 	//Prompt for a data file, verify the file, and attempt to merge the eclipses into existing LinkedList
@@ -657,7 +657,7 @@ void option_M(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclips
 	input.close(); //input file is done being read
 }
 
-AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Eclipse* myEclipse,int lineNum,
+AvlTree<Eclipse>* option_P(string tmp,ifstream& input,char iFilename[],AvlTree<Eclipse>* myTree,Eclipse* myEclipse,int lineNum,
 		int& totalLinesRead, int& totalValidLinesRead)
 {
 	//Prompt for a data file, verify the file, and attempt to purge the eclipses from LinkedList. If the
@@ -705,19 +705,19 @@ AvlTree* option_P(string tmp,ifstream& input,char iFilename[],AvlTree* myTree,Ec
 	return myTree;
 }
 
-void option_R(AvlTree* myTree) //prints AVLtree contents pre-order
+void option_R(AvlTree<Eclipse>* myTree) //prints AVLtree contents pre-order
 {
 	myTree->printPreOrder();
 	cout << endl;
 }
 
-void option_C(AvlTree* myTree) //prints AVLtree contents in-order
+void option_C(AvlTree<Eclipse>* myTree) //prints AVLtree contents in-order
 {
 	myTree->printInOrder();
 	cout << endl;
 }
 
-void option_T(AvlTree* myTree) //prints AVLtree contents post-order
+void option_T(AvlTree<Eclipse>* myTree) //prints AVLtree contents post-order
 {
 	myTree->printPostOrder();
 	cout << endl;

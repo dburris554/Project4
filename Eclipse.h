@@ -31,6 +31,9 @@ class Eclipse
 		int getID();
 		bool getIsBlank();
 		Eclipse* operator=(const Eclipse& myEclipse);
+		bool operator==(Eclipse myEclipse);
+		bool operator<(Eclipse myEclipse);
+		bool operator>(Eclipse myEclipse);
 		int compareId(Eclipse* myEclipse);
 		int convertToInt(string str);
 
